@@ -1,0 +1,1062 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>POTA Moldova</title>
+<!-- TEST: cere motoarelor de căutare să nu afișeze pagina (se scoate la lansarea oficială) -->
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Statistici neoficiale pentru parcurile Parks on the Air din Republica Moldova · Unofficial statistics for Parks on the Air in the Republic of Moldova">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bitter:wght@700&family=Source+Sans+3:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+/* ---------- Culori și fonturi: varianta „Topografic” (hartă turistică tipărită) ---------- */
+:root{
+  --bg:#eef1e8; --surface:#fbfcf8; --ink:#1e2a22; --muted:#5d685d; --line:#d3dacb;
+  --act:#4a7a35; --act-soft:#e1ead7;     /* parc activat: verde de pădure pe hartă */
+  --none:#7a5228; --none-fill:#f3eadf;   /* neactivat: maro de curbă de nivel */
+  --live:#c8322b; --live-soft:#fbeceb;   /* în aer acum */
+  --me:#2f6f9f;                          /* locatorul vizitatorului: albastru de apă */
+  --hi:#8a5a2b; --hi-soft:#f3eadf;       /* „așteaptă prima activare” */
+  --head:"Bitter",Georgia,serif; --body:"Source Sans 3",system-ui,sans-serif;
+  --head-w:700; --radius:4px;
+}
+
+/* ---------- Bază ---------- */
+*{box-sizing:border-box}
+html{scroll-padding-top:64px}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--body)}
+a{color:var(--act);text-underline-offset:2px}
+:focus-visible{outline:2px solid var(--act);outline-offset:2px}
+[hidden]{display:none !important}
+.wrap{max-width:1180px;margin:0 auto;padding-left:20px;padding-right:20px}
+h1,h2{font-family:var(--head);font-weight:var(--head-w);margin:0;line-height:1.1}
+h1{font-size:clamp(32px,4.6vw,48px);letter-spacing:-.01em}
+h2{font-size:24px}
+.sub{color:var(--muted);font-size:14px;margin:4px 0 12px}
+.n{font-family:var(--head);font-weight:var(--head-w);font-variant-numeric:tabular-nums;line-height:1}
+section{margin-top:44px}
+.linkbtn{background:none;border:0;padding:0;font:inherit;font-size:14px;font-weight:700;color:var(--act);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+a.more{display:inline-block;margin-top:10px;font-size:14px;font-weight:700}
+
+/* ---------- Partea de sus: meniu, bandă live, titlu ---------- */
+nav{position:sticky;top:0;z-index:1000;background:var(--surface);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;align-items:center;gap:22px;height:52px}
+/* TEST: eticheta „versiune de test” de lângă titlu (se scoate la lansarea oficială) */
+.testtag{margin-left:-12px;margin-right:auto;font-size:12px;font-weight:700;color:var(--hi);background:var(--hi-soft);border:1px solid var(--hi);border-radius:99px;padding:1px 8px;white-space:nowrap}
+nav .brand{font-family:var(--head);font-weight:var(--head-w);font-size:19px;color:var(--ink);text-decoration:none}
+nav a.lnk{color:var(--muted);text-decoration:none;font-size:15px;font-weight:600;padding:14px 0;border-bottom:3px solid transparent}
+nav a.lnk:hover{color:var(--act)}
+nav a.lnk.on{color:var(--ink);border-bottom-color:var(--act)}
+.lang{display:flex;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.lang button{background:transparent;color:var(--muted);border:0;padding:4px 11px;font:700 13px var(--body);cursor:pointer}
+.lang button.on{background:var(--ink);color:var(--surface)}
+
+.band{margin-top:20px;background:var(--surface);border:1px solid var(--line);border-left:5px solid var(--none);padding:11px 16px;display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;font-size:15px}
+.band .dot{width:10px;height:10px;border-radius:50%;background:var(--none);flex:none}
+.band .when{margin-left:auto;color:var(--muted);font-size:13px}
+.band.on{border-left-color:var(--live);background:var(--live-soft)}
+.band.on .dot{background:var(--live);animation:clipire 2s infinite}
+.band table{flex-basis:100%;margin-top:4px}
+@keyframes clipire{50%{opacity:.35}}
+@media (prefers-reduced-motion:reduce){.band.on .dot{animation:none}}
+
+.title{padding:26px 0 22px}
+.title .sub{font-size:15px;max-width:70ch;margin-top:8px}
+.title .sub a{color:inherit}
+.ptitle{padding:24px 0 16px}
+
+/* Curbe de nivel discrete în spatele titlului */
+.top{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='220' viewBox='0 0 600 220'%3E%3Cg fill='none' stroke='%23a5825c' stroke-opacity='.22' stroke-width='1.2'%3E%3Cpath d='M-20 170C80 120 160 200 260 150S440 60 620 120'/%3E%3Cpath d='M-20 140C90 90 170 170 270 120S450 30 620 90'/%3E%3Cpath d='M-20 110C100 60 180 140 280 90S460 0 620 60'/%3E%3Cpath d='M-20 200C70 150 150 230 250 180S430 90 620 150'/%3E%3Cpath d='M380 40c40-20 90-10 110 15s-20 50-60 45-80-40-50-60z'/%3E%3C/g%3E%3C/svg%3E");background-repeat:repeat-x;background-position:right 30px}
+
+/* ---------- Harta și cifrele (pagina Acum) ---------- */
+.hero{display:grid;grid-template-columns:minmax(0,1.75fr) minmax(0,1fr);gap:28px;align-items:center}
+#map{height:520px;border:1px solid var(--line);border-radius:var(--radius);background:var(--line)}
+.leaflet-container{font:13px/1.4 var(--body)}
+.kp{display:flex;flex-direction:column;gap:22px}
+.kp .n{font-size:52px;display:block}
+.kp .lbl{color:var(--muted);font-size:15px;margin-top:4px}
+.kp .bar{height:7px;background:var(--act-soft);margin-top:9px;max-width:260px}
+.kp .bar i{display:block;height:100%;background:var(--act)}
+.kp .wait{border-left:5px solid var(--hi);background:var(--hi-soft);padding:12px 14px}
+.kp .wait .n{color:var(--hi)}
+.kp .wait .linkbtn{color:var(--hi);margin-top:6px}
+.kp .pair{display:flex;gap:36px}
+.kp .pair .n{font-size:32px}
+
+.under{display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px;margin-top:12px;font-size:14px;color:var(--muted)}
+.legend{display:flex;flex-wrap:wrap;gap:4px 16px;list-style:none;margin:0;padding:0}
+.legend li{display:flex;align-items:center;gap:6px}
+.mk{width:11px;height:11px;border-radius:50%;display:inline-block;flex:none}
+/* Semnele din legendă, identice cu markerele de pe hartă */
+.mk.act{background:var(--act);box-shadow:0 0 0 2px #fff}
+.mk.no{width:13px;height:13px;border:2.5px solid var(--none);background:radial-gradient(circle,var(--none) 0 2px,#fff 2.5px)}
+.mk.live{background:var(--live)} .mk.me{background:var(--me)}
+/* Valul care pulsează în jurul unui parc „în aer acum” */
+.puls{display:block;width:16px;height:16px;border-radius:50%;border:2px solid var(--live);animation:val 1.8s ease-out infinite}
+@keyframes val{from{transform:scale(1);opacity:.8}to{transform:scale(2.3);opacity:0}}
+@media (prefers-reduced-motion:reduce){.puls{animation:none;transform:scale(1.8);opacity:.45}}
+.loc{margin-left:auto;display:flex;align-items:center;gap:8px}
+
+/* Fișa unui parc (pe hartă) */
+.fisa{min-width:200px}
+.fisa .nm{font-weight:700;font-size:14px;margin:6px 0 2px}
+.fisa .ln{color:var(--muted)}
+.fisa .acts{display:flex;flex-direction:column;gap:2px;margin-top:8px;font-weight:700}
+
+/* ---------- Pagina Hartă ---------- */
+.bigmap{display:grid;grid-template-columns:250px minmax(0,1fr);gap:20px;padding-bottom:24px}
+.side{display:flex;flex-direction:column;gap:18px;font-size:15px}
+.side h3{font:700 14px var(--body);color:var(--muted);margin:0 0 6px}
+.side label.cb{display:flex;align-items:center;gap:8px;padding:3px 0;cursor:pointer}
+.side input[type=checkbox]{width:17px;height:17px;accent-color:var(--act);margin:0}
+.side select,.side input[type=search],.side input[type=text]{width:100%}
+.side .cnt{color:var(--muted);font-size:14px}
+#map2{height:calc(100vh - 210px);min-height:480px;border:1px solid var(--line);border-radius:var(--radius);background:var(--line)}
+
+/* ---------- Tabele ---------- */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:40px}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+th{color:var(--muted);font-size:13px;font-weight:700;white-space:nowrap}
+th.s{cursor:pointer;user-select:none}
+th.s:hover{color:var(--ink)}
+td.r,th.r{text-align:right;font-variant-numeric:tabular-nums}
+td.rank{color:var(--muted);width:28px}
+td.name{max-width:0;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+td.dt{white-space:nowrap;font-variant-numeric:tabular-nums}
+tr:hover td{background:color-mix(in srgb,var(--act-soft) 45%,transparent)}
+tr.click{cursor:pointer}
+tr.open td{background:var(--act-soft)}
+tr.det>td{background:var(--surface);padding:14px 16px 18px;border-left:4px solid var(--act)}
+tr.det:hover>td{background:var(--surface)}
+.det h3{font:700 15px var(--body);margin:0 0 8px}
+.det table{font-size:14px;max-width:680px}
+.det .links{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:10px;font-size:14px;font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips .ref{font-size:13px}
+.chips small{color:var(--muted);font-weight:600;margin-left:3px}
+.small{font-size:12px;font-weight:700;color:var(--muted);border:1px solid var(--line);padding:0 5px;border-radius:99px;margin-left:6px;white-space:nowrap}
+
+/* Referința parcului: plăcuță cu bandă colorată, ca un marcaj de traseu */
+.ref{display:inline-block;border-left:4px solid var(--act);background:var(--act-soft);color:var(--ink);padding:1px 7px;
+  font-weight:700;font-size:13.5px;text-decoration:none;white-space:nowrap;font-variant-numeric:tabular-nums}
+.ref.no{border-left-color:var(--none);background:var(--none-fill);box-shadow:inset 0 0 0 1px var(--line)}
+a.ref:hover{background:var(--act);color:var(--surface)}
+button.call{background:none;border:0;padding:0;font:inherit;font-weight:700;color:var(--ink);cursor:pointer}
+button.call:hover{color:var(--act);text-decoration:underline}
+
+/* File (Activatori / Parcuri / Raioane) */
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:6px}
+.tabs a{padding:8px 14px;text-decoration:none;color:var(--muted);font-weight:700;border-bottom:3px solid transparent;margin-bottom:-1px}
+.tabs a.on{color:var(--ink);border-bottom-color:var(--act)}
+.bar.mini{height:6px;background:var(--act-soft);min-width:80px}
+.bar.mini i{display:block;height:100%;background:var(--act)}
+
+/* ---------- Raioane (rezumat) ---------- */
+.rai{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px 24px;font-size:15px}
+.rai .bar{height:6px;background:var(--act-soft);margin-top:5px}
+.rai .bar i{display:block;height:100%;background:var(--act)}
+.rai span{color:var(--muted);font-variant-numeric:tabular-nums}
+
+/* ---------- Câmpuri ---------- */
+.tools{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;align-items:center}
+input,select{font:inherit;font-size:15px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:8px 11px}
+input::placeholder{color:var(--muted)}
+input.locIn{width:96px;text-transform:uppercase}
+button.go{font:700 15px var(--body);background:var(--act);color:var(--surface);border:1px solid var(--act);border-radius:var(--radius);padding:8px 16px;cursor:pointer}
+.tag{font-size:12px;font-weight:700;padding:0 6px;border-radius:99px;margin-left:6px}
+.tag.live{background:var(--live);color:#fff}
+.err{color:var(--live);font-size:14px;margin:6px 0}
+.err:empty{display:none}
+.empty{color:var(--muted);padding:14px 0}
+/* Statisticile unui indicativ: cartonașele Moldova (verde) și Global (albastru) */
+.who{margin:8px 0 12px}.who b{font-size:19px}.who span{color:var(--muted)}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:1000px}
+.card{background:var(--surface);border:1px solid var(--line);border-top:5px solid var(--act);padding:14px 16px}
+.card.gl{border-top-color:var(--me)}
+.card .hd{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:10px}
+.card .hd b{font:700 19px var(--head)}
+.card .hd small{color:var(--muted);font-size:13px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}
+.stats div{background:var(--surface);padding:10px 12px}
+.stats .n{font-size:26px;display:block}
+.stats .n.d{font-size:17px;line-height:1.5}
+.stats small{color:var(--muted);font-size:13px}
+.card .row{font-size:14px;color:var(--muted);margin-top:12px}
+.card .row b{color:var(--ink)}
+.split{display:flex;height:9px;margin:5px 0 4px;background:var(--line)}
+.split i{display:block;height:100%}
+.card .note{font-size:12.5px;color:var(--muted);margin-top:12px}
+@media (max-width:900px){.cards{grid-template-columns:1fr}}
+
+footer{margin-top:56px;padding-top:18px;padding-bottom:40px;border-top:1px solid var(--line);color:var(--muted);font-size:13.5px}
+footer p{margin:0;max-width:85ch}
+
+/* ---------- Ecrane mai înguste (varianta pentru telefon vine separat) ---------- */
+@media (max-width:900px){
+  .hero,.two,.bigmap{grid-template-columns:1fr}
+  #map{height:420px}
+  nav .wrap{gap:14px}
+}
+</style>
+</head>
+<body>
+<div class="top">
+  <nav><div class="wrap">
+    <a class="brand" href="#acum">POTA Moldova</a>
+    <span class="testtag" data-t="testTag"></span>
+    <a class="lnk" href="#acum" data-v="acum" data-t="navNow"></a>
+    <a class="lnk" href="#harta" data-v="harta" data-t="navMap"></a>
+    <a class="lnk" href="#clasament" data-v="clasament" data-t="navLead"></a>
+    <a class="lnk" href="#parcuri" data-v="parcuri" data-t="navParks"></a>
+    <div class="lang" role="group" aria-label="Limba / Language">
+      <button data-lang="ro" lang="ro">RO</button><button data-lang="en" lang="en">EN</button>
+    </div>
+  </div></nav>
+
+  <div class="wrap">
+    <!-- Banda live (pe toate paginile): gri când nu e nimeni în aer, roșie când cineva activează un parc MD -->
+    <div class="band" id="band" aria-live="polite"></div>
+
+    <!-- Titlu + nota obligatorie (doar pe pagina Acum) -->
+    <div class="title" id="homeTitle">
+      <h1 data-t="title"></h1>
+      <p class="sub" data-t="note"></p>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== PAGINA „ACUM” (rezumatul) ===================== -->
+<main class="wrap view" id="v-acum">
+  <div class="hero" id="h-harta">
+    <div id="map"></div>
+    <div class="kp" id="kpis"></div>
+  </div>
+  <div class="under">
+    <ul class="legend">
+      <li><span class="mk act"></span><span data-t="lgAct"></span></li>
+      <li><span class="mk no"></span><span data-t="lgNo"></span></li>
+      <li><span class="mk live"></span><span data-t="lgLive"></span></li>
+      <li class="meLegend" hidden><span class="mk me"></span><span data-t="lgMe"></span></li>
+    </ul>
+    <a href="#harta" style="font-weight:700" data-t="openBigMap"></a>
+    <div class="loc">
+      <label for="loc" data-t="locLabel"></label>
+      <input id="loc" class="locIn" placeholder="KN47" maxlength="6" autocomplete="off">
+      <span class="locInfo"></span>
+    </div>
+  </div>
+  <div class="err" id="dataErr"></div>
+
+  <section class="two">
+    <div>
+      <h2 data-t="leadTitle"></h2>
+      <p class="sub" data-t="leadSub"></p>
+      <table id="lead"></table>
+      <a class="more" href="#clasament" data-t="allLead"></a>
+    </div>
+    <div>
+      <h2 data-t="topTitle"></h2>
+      <p class="sub" data-t="topSub"></p>
+      <table id="top"></table>
+      <a class="more" href="#clasament/parcuri" data-t="allTop"></a>
+    </div>
+  </section>
+
+  <section>
+    <h2 data-t="raionTitle"></h2>
+    <p class="sub" data-t="raionSub"></p>
+    <div class="rai" id="raioane"></div>
+    <a class="more" href="#clasament/raioane" data-t="raionAll"></a>
+  </section>
+
+  <section>
+    <h2 data-t="searchTitle"></h2>
+    <div class="tools" style="margin-top:12px">
+      <input id="q" data-t-ph="search" style="flex:1;min-width:220px" autocomplete="off">
+      <select id="fAct" class="fAct"></select>
+      <select id="fRaion" class="fRaion"></select>
+    </div>
+    <table id="parks"></table>
+    <a class="more" href="#parcuri" id="parksAllLink"></a>
+  </section>
+
+  <section id="indicativ">
+    <h2 data-t="callTitle"></h2>
+    <div class="tools" style="margin-top:12px">
+      <input id="call" placeholder="ER1ABC" style="width:150px;text-transform:uppercase" autocomplete="off">
+      <button class="go" id="btnCall" data-t="callBtn"></button>
+    </div>
+    <div id="callBox"></div>
+  </section>
+</main>
+
+<!-- ===================== PAGINA „HARTĂ” ===================== -->
+<main class="wrap view" id="v-harta" hidden>
+  <div class="ptitle"><h1 data-t="mapPageTitle"></h1></div>
+  <div class="bigmap">
+    <aside class="side">
+      <div>
+        <h3 data-t="mapShow"></h3>
+        <label class="cb"><input type="checkbox" id="cbAct" checked><span class="mk act"></span><span data-t="lgAct"></span></label>
+        <label class="cb"><input type="checkbox" id="cbNo" checked><span class="mk no"></span><span data-t="lgNo"></span></label>
+        <label class="cb"><input type="checkbox" id="cbLive" checked><span class="mk live"></span><span data-t="lgLive"></span></label>
+      </div>
+      <div><h3><label for="mRaion" data-t="mapRaion"></label></h3><select id="mRaion" class="fRaion"></select></div>
+      <div><h3><label for="mQ" data-t="mapSearch"></label></h3><input type="search" id="mQ" data-t-ph="search" autocomplete="off"></div>
+      <div>
+        <h3><label for="mLoc" data-t="locLabel"></label></h3>
+        <input id="mLoc" class="locIn" placeholder="KN47" maxlength="6" autocomplete="off">
+        <div class="cnt locInfo" style="margin-top:4px"></div>
+      </div>
+      <div class="cnt" id="mCount"></div>
+    </aside>
+    <div id="map2"></div>
+  </div>
+</main>
+
+<!-- ===================== PAGINA „CLASAMENT” ===================== -->
+<main class="wrap view" id="v-clasament" hidden>
+  <div class="ptitle"><h1 data-t="leadPageTitle"></h1></div>
+  <div class="tabs">
+    <a href="#clasament" data-tab="activatori" data-t="tabOps"></a>
+    <a href="#clasament/parcuri" data-tab="parcuri" data-t="tabParks"></a>
+    <a href="#clasament/raioane" data-tab="raioane" data-t="tabRaion"></a>
+  </div>
+  <p class="sub" id="tabNote"></p>
+  <table id="bigTable"></table>
+</main>
+
+<!-- ===================== PAGINA „PARCURI” ===================== -->
+<main class="wrap view" id="v-parcuri" hidden>
+  <div class="ptitle"><h1 id="parksTitle"></h1><p class="sub" data-t="parksPageNote"></p></div>
+  <div class="tools">
+    <input id="pQ" data-t-ph="search" style="flex:1;min-width:220px" autocomplete="off">
+    <select id="pAct" class="fAct"></select>
+    <select id="pRaion" class="fRaion"></select>
+    <label for="pLoc" class="sub" style="margin:0" data-t="locLabel"></label>
+    <input id="pLoc" class="locIn" placeholder="KN47" maxlength="6" autocomplete="off">
+  </div>
+  <table id="allParks"></table>
+</main>
+
+<footer class="wrap"><p data-t="footer"></p></footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+// ---------- Setări ----------
+const API = 'https://api.pota.app';    // doar pentru spoturi live și statistici pe indicativ
+const SPOT_REFRESH = 60;               // secunde între actualizări de spoturi
+const TOP = 10;                        // câte rânduri în rezumatele de pe pagina Acum
+const QSO_MINIM = 10;                  // regula POTA: activare validă de la 10 QSO-uri
+
+// ---------- Textele paginii în cele două limbi ----------
+const POTA = '<a href="https://pota.app" target="_blank" rel="noopener">pota.app</a>';
+const OSM = 'https://www.openstreetmap.org/copyright';
+const SRC = 'https://github.com/lilixp/pota-moldova';
+// Româna cere „de” după numerele 20–99, 100, 120 etc. (ex. „62 de parcuri”, dar „15 parcuri”)
+const de = n => (n % 100 >= 20 || (n > 0 && n % 100 === 0)) ? 'de ' : '';
+const T = {
+  ro: {
+    locale: 'ro-RO',
+    navNow: 'Acum', navMap: 'Hartă', navLead: 'Clasament', navParks: 'Parcuri',
+    testTag: 'versiune de test',
+    title: 'Parcurile POTA din Moldova',
+    note: `Proiect independent, neoficial. Date de la ${POTA}, actualizate zilnic. Nu este un site oficial Parks on the Air.`,
+    loading: 'Se încarcă…',
+    liveNone: 'Nimeni în aer acum în parcurile MD.',
+    lastAct: (c, ref, name, d) => `Ultima activare: <b>${c}</b> din ${ref} ${name}, ${d}`,
+    liveOn: n => `În aer acum în parcurile MD: ${n} ${n === 1 ? 'activare' : de(n) + 'activări'}`,
+    checked: h => `verificat la ${h}`,
+    spotHead: ['Activator', 'kHz', 'Mod', 'Parc', 'Spotat'],
+    ago: m => m < 1 ? 'acum' : m < 60 ? `acum ${m} min` : `acum ${Math.floor(m/60)} h ${m%60} min`,
+    kTotal: 'parcuri POTA în Moldova',
+    kAct: p => `activate cel puțin o dată (${p}%)`,
+    kWait: 'așteaptă prima activare',
+    showWait: 'Vezi pe hartă', showAll: 'Arată toate parcurile pe hartă',
+    kQso: 'QSO-uri', kOps: 'activatori',
+    lgAct: 'activat', lgNo: 'neactivat', lgLive: 'în aer acum', lgMe: 'locatorul tău',
+    openBigMap: 'Deschide harta mare',
+    locLabel: 'Locatorul tău:', locBad: 'Locator invalid (ex. KN47 sau KN47ab)', locSaved: 'salvat doar în browserul tău',
+    leadTitle: 'Clasament activatori',
+    leadSub: 'Top 10 · activare validă: cel puțin 10 QSO-uri · clic pe indicativ pentru detalii',
+    leadHead: ['', 'Indicativ', 'Activări', 'Parcuri', 'QSO'],
+    allLead: 'Tot clasamentul',
+    topTitle: 'Top parcuri', topSub: 'Top 10 · după numărul de QSO-uri',
+    topHead: ['Parc', '', 'QSO'], allTop: 'Toate parcurile după QSO',
+    raionTitle: 'Pe raioane', raionSub: 'Parcuri activate din total', raionAll: 'Toate raioanele',
+    searchTitle: 'Caută un parc', search: 'Nume sau referință, de exemplu Codru',
+    fAll: 'Toate', fYes: 'Doar activate', fNo: 'Doar neactivate', allRaion: 'Toate raioanele',
+    parksAll: n => `Toate cele ${n} ${de(n)}parcuri`, noParks: 'Niciun parc nu se potrivește căutării.',
+    callTitle: 'Statisticile unui indicativ', callBtn: 'Arată',
+    callNone: 'Indicativul nu există în POTA.',
+    // Cartonașele Moldova / Global
+    mdCard: 'Moldova', glCard: 'Global', glSub: 'toate țările',
+    rankMd: n => `locul ${n} în clasamentul MD`,
+    mdKpi: ['activări', 'parcuri MD', 'QSO', 'tentative', 'prima activare', 'ultima activare'],
+    modes: 'Moduri', phone: 'Fonie', topOf: 'Parcurile cu cele mai multe activări',
+    allOf: n => `Toate cele ${n} ${de(n)}parcuri`,
+    mdNote: d => `Din datele zilnice ale paginii, actualizate la ${d}.`,
+    mdNone: 'Nicio activare în parcurile MD încă.',
+    glKpi: ['activări', 'parcuri activate', 'QSO activator', 'parcuri vânate', 'QSO hunter', 'awards'],
+    split: 'Parcuri activate: Moldova și restul lumii',
+    inMd: n => `${n} în Moldova`, elsewhere: (n, a) => `${n} în alte țări (${a} ${a === 1 ? 'activare' : de(a) + 'activări'})`,
+    tentRow: (a, p) => `Tentative sub 10 QSO: <b>${a}</b> · parcuri doar cu tentative: <b>${p}</b>`,
+    glNote: 'Live din profilul public pota.app, la cererea ta. Doar activările valide (cel puțin 10 QSO), ca pe pota.app.',
+    // Pagina Hartă
+    mapPageTitle: 'Harta parcurilor', mapShow: 'Arată pe hartă', mapRaion: 'Raion', mapSearch: 'Caută',
+    mapCount: n => `${n} ${n === 1 ? 'parc' : de(n) + 'parcuri'} pe hartă`,
+    fActs: 'Activări', fQso: 'QSO', fLast: 'Ultima activare', fNever: 'încă nu a fost activat',
+    history: 'Istoricul activărilor', onPota: 'Pagina parcului pe pota.app', showOnMap: 'Vezi pe hartă',
+    // Pagina Clasament
+    leadPageTitle: 'Clasamente', tabOps: 'Activatori', tabParks: 'Parcuri', tabRaion: 'Raioane',
+    noteOps: 'Toți activatorii din parcurile MD. Activare validă: cel puțin 10 QSO-uri; tentativă: sub 10. Clic pe un rând pentru parcurile activate.',
+    noteParks: 'Parcurile MD cu cel puțin o activare. Clic pe un rând pentru istoric.',
+    noteRaion: 'Toate raioanele, cu parcurile și activitatea lor.',
+    cRank: '#', cCall: 'Indicativ', cActs: 'Activări', cTent: 'Tentative', cParks: 'Parcuri', cQso: 'QSO',
+    cFirst: 'Prima', cLast: 'Ultima', cRef: 'Ref.', cPark: 'Parc', cRaion: 'Raion', cOps: 'Activatori',
+    cActd: 'Activate', cPct: '%', cKm: 'km',
+    opsParks: n => `Parcuri MD activate (${n})`, globalBtn: 'Statistici POTA globale',
+    // Pagina Parcuri
+    parksTitle: n => `Toate cele ${n} ${de(n)}parcuri`,
+    parksPageNote: 'Clic pe un rând pentru istoricul activărilor. Clic pe titlul unei coloane pentru sortare.',
+    hDate: 'Data', hOp: 'Activator', hQso: 'QSO', hCw: 'CW', hPh: 'Fonie', hData: 'DATA', under10: 'sub 10 QSO',
+    histNone: 'Parcul nu a fost activat încă.',
+    errNet: 'Datele nu s-au putut încărca. Verifică internetul și reîncarcă pagina.',
+    errMap: 'Harta nu s-a putut încărca. Verifică internetul.',
+    footer: `Proiect independent realizat de ER1PL, neafiliat cu Parks on the Air®.
+      Date: ${POTA}, prin API-ul intern al site-ului, care se poate schimba sau opri oricând.
+      Spoturile se citesc live; parcurile și clasamentele se actualizează o dată pe zi.
+      Hartă © <a href="${OSM}" target="_blank" rel="noopener">contribuitorii OpenStreetMap</a>.
+      <a href="${SRC}" target="_blank" rel="noopener">Codul sursă pe GitHub</a>.`,
+  },
+  en: {
+    locale: 'en-GB',
+    navNow: 'Now', navMap: 'Map', navLead: 'Leaderboard', navParks: 'Parks',
+    testTag: 'test version',
+    title: 'POTA parks in Moldova',
+    note: `Independent, unofficial project. Data from ${POTA}, updated daily. This is not an official Parks on the Air website.`,
+    loading: 'Loading…',
+    liveNone: 'Nobody is on the air in MD parks right now.',
+    lastAct: (c, ref, name, d) => `Last activation: <b>${c}</b> from ${ref} ${name}, ${d}`,
+    liveOn: n => `On the air now in MD parks: ${n} ${n === 1 ? 'activation' : 'activations'}`,
+    checked: h => `checked at ${h}`,
+    spotHead: ['Activator', 'kHz', 'Mode', 'Park', 'Spotted'],
+    ago: m => m < 1 ? 'just now' : m < 60 ? `${m} min ago` : `${Math.floor(m/60)} h ${m%60} min ago`,
+    kTotal: 'POTA parks in Moldova',
+    kAct: p => `activated at least once (${p}%)`,
+    kWait: 'waiting for their first activation',
+    showWait: 'Show on map', showAll: 'Show all parks on the map',
+    kQso: 'QSOs', kOps: 'activators',
+    lgAct: 'activated', lgNo: 'not activated', lgLive: 'on the air now', lgMe: 'your locator',
+    openBigMap: 'Open the large map',
+    locLabel: 'Your locator:', locBad: 'Invalid locator (e.g. KN47 or KN47ab)', locSaved: 'stored only in your browser',
+    leadTitle: 'Activator leaderboard',
+    leadSub: 'Top 10 · valid activation: at least 10 QSOs · click a callsign for details',
+    leadHead: ['', 'Callsign', 'Activations', 'Parks', 'QSOs'],
+    allLead: 'Full leaderboard',
+    topTitle: 'Top parks', topSub: 'Top 10 · by number of QSOs',
+    topHead: ['Park', '', 'QSOs'], allTop: 'All parks by QSOs',
+    raionTitle: 'By district', raionSub: 'Activated parks out of total', raionAll: 'All districts',
+    searchTitle: 'Find a park', search: 'Name or reference, for example Codru',
+    fAll: 'All', fYes: 'Activated only', fNo: 'Not activated only', allRaion: 'All districts',
+    parksAll: n => `All ${n} parks`, noParks: 'No park matches your search.',
+    callTitle: 'Callsign stats', callBtn: 'Show',
+    callNone: 'This callsign is not in POTA.',
+    mdCard: 'Moldova', glCard: 'Global', glSub: 'all countries',
+    rankMd: n => `#${n} in the MD leaderboard`,
+    mdKpi: ['activations', 'MD parks', 'QSOs', 'attempts', 'first activation', 'last activation'],
+    modes: 'Modes', phone: 'Phone', topOf: 'Parks with the most activations',
+    allOf: n => `All ${n} parks`,
+    mdNote: d => `From this page's daily data, updated ${d}.`,
+    mdNone: 'No activations in MD parks yet.',
+    glKpi: ['activations', 'parks activated', 'activator QSOs', 'parks hunted', 'hunter QSOs', 'awards'],
+    split: 'Parks activated: Moldova and the rest of the world',
+    inMd: n => `${n} in Moldova`, elsewhere: (n, a) => `${n} in other countries (${a} ${a === 1 ? 'activation' : 'activations'})`,
+    tentRow: (a, p) => `Attempts under 10 QSOs: <b>${a}</b> · parks with attempts only: <b>${p}</b>`,
+    glNote: 'Live from the public pota.app profile, on request. Valid activations only (at least 10 QSOs), as on pota.app.',
+    mapPageTitle: 'Park map', mapShow: 'Show on the map', mapRaion: 'District', mapSearch: 'Search',
+    mapCount: n => `${n} ${n === 1 ? 'park' : 'parks'} on the map`,
+    fActs: 'Activations', fQso: 'QSOs', fLast: 'Last activation', fNever: 'not activated yet',
+    history: 'Activation history', onPota: 'Park page on pota.app', showOnMap: 'Show on map',
+    leadPageTitle: 'Leaderboards', tabOps: 'Activators', tabParks: 'Parks', tabRaion: 'Districts',
+    noteOps: 'All activators in MD parks. Valid activation: at least 10 QSOs; attempt: under 10. Click a row to see their parks.',
+    noteParks: 'MD parks with at least one activation. Click a row for its history.',
+    noteRaion: 'All districts, with their parks and activity.',
+    cRank: '#', cCall: 'Callsign', cActs: 'Activations', cTent: 'Attempts', cParks: 'Parks', cQso: 'QSOs',
+    cFirst: 'First', cLast: 'Last', cRef: 'Ref.', cPark: 'Park', cRaion: 'District', cOps: 'Activators',
+    cActd: 'Activated', cPct: '%', cKm: 'km',
+    opsParks: n => `MD parks activated (${n})`, globalBtn: 'Global POTA stats',
+    parksTitle: n => `All ${n} parks`,
+    parksPageNote: 'Click a row for its activation history. Click a column title to sort.',
+    hDate: 'Date', hOp: 'Activator', hQso: 'QSOs', hCw: 'CW', hPh: 'Phone', hData: 'DATA', under10: 'under 10 QSOs',
+    histNone: 'This park has not been activated yet.',
+    errNet: 'Could not load the data. Check your connection and reload the page.',
+    errMap: 'The map could not load. Check your connection.',
+    footer: `Independent project by ER1PL, not affiliated with Parks on the Air®.
+      Data: ${POTA}, via the site's internal API, which may change or stop at any time.
+      Spots are read live; parks and leaderboards are updated once a day.
+      Map © <a href="${OSM}" target="_blank" rel="noopener">OpenStreetMap contributors</a>.
+      <a href="${SRC}" target="_blank" rel="noopener">Source code on GitHub</a>.`,
+  },
+};
+
+// Raioanele după codul ISO folosit de POTA (locationDesc); nume proprii, la fel în ambele limbi
+const RAION = {AN:'Anenii Noi',BS:'Basarabeasca',BR:'Briceni',CA:'Cahul',CT:'Cantemir',CL:'Călărași',
+  CS:'Căușeni',CM:'Cimișlia',CR:'Criuleni',DO:'Dondușeni',DR:'Drochia',DU:'Dubăsari',ED:'Edineț',
+  FA:'Fălești',FL:'Florești',GL:'Glodeni',HI:'Hîncești',IA:'Ialoveni',LE:'Leova',NI:'Nisporeni',
+  OC:'Ocnița',OR:'Orhei',RE:'Rezina',RI:'Rîșcani',SI:'Sîngerei',SO:'Soroca',ST:'Strășeni',
+  SD:'Șoldănești',SV:'Ștefan Vodă',TA:'Taraclia',TE:'Telenești',UN:'Ungheni',BA:'Bălți',
+  BD:'Bender',CU:'Chișinău',GA:'Găgăuzia',SN:'Stânga Nistrului'};
+const raionName = code => { const k = (code||'').split(',')[0].replace('MD-',''); return RAION[k] || code || '—'; };
+
+// ---------- Utilitare ----------
+const $ = id => document.getElementById(id);
+const $$ = sel => document.querySelectorAll(sel);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const store = {                                     // memorie locală, doar în browserul vizitatorului
+  get(k){ try { return localStorage.getItem(k); } catch { return null; } },
+  set(k,v){ try { v ? localStorage.setItem(k, v) : localStorage.removeItem(k); } catch {} }
+};
+
+// Limba: ?lang=en în adresă > alegerea salvată > limba browserului
+const urlLang = new URLSearchParams(location.search).get('lang');
+let lang = T[urlLang] ? urlLang : T[store.get('potaMdLang')] ? store.get('potaMdLang')
+         : /^(ro|mo)\b/i.test(navigator.language || '') ? 'ro' : 'en';
+const t = k => T[lang][k];
+const fmt = n => (n ?? 0).toLocaleString(t('locale'));
+const fmtDate = iso => iso ? new Date(iso + 'T12:00:00').toLocaleDateString(t('locale')) : '—';
+const errText = e => e.message === 'NET' ? t('errNet') : e.message;
+// Plăcuța unei referințe de parc; implicit duce la istoricul parcului de pe pagina Parcuri
+const refTag = (ref, activated = true, href = '#parcuri/' + ref) =>
+  `<a class="ref${activated ? '' : ' no'}" href="${esc(href)}">${esc(ref)}</a>`;
+// Numele scurt al parcului: fără partea în engleză ("... Nature Reserve", "(Medicinal plants)")
+const shortName = n => n.replace(/\s*\([^)]*\)/g, '')
+  .replace(/\s+(National Park|Nature Reserve|Nature Park|Landscape Reserve|Forest Reserve|Park Reserve|Reserve|Park)$/i, '')
+  .replace(/^(Parcul național|Rezervația științifică|Rezervația peisagistică|Rezervația silvică|Rezervația de plante medicinale|Pădurea-parc|Parcul)\s+/i, '');
+const isoDate = d => d && d.length === 8 ? `${d.slice(0,4)}-${d.slice(4,6)}-${d.slice(6,8)}` : null;
+
+// Locator Maidenhead (4 sau 6 caractere) -> centrul pătratului, în grade
+function locToLatLon(loc){
+  const s = (loc||'').trim().toUpperCase();
+  if (!/^[A-R]{2}[0-9]{2}([A-X]{2})?$/.test(s)) return null;
+  let lon = (s.charCodeAt(0)-65)*20 - 180 + (+s[2])*2;
+  let lat = (s.charCodeAt(1)-65)*10 - 90 + (+s[3]);
+  if (s.length === 6){ lon += (s.charCodeAt(4)-65)*5/60 + 2.5/60; lat += (s.charCodeAt(5)-65)*2.5/60 + 1.25/60; }
+  else { lon += 1; lat += 0.5; }
+  return {lat, lon, loc: s.slice(0,4) + s.slice(4).toLowerCase()};   // forma uzuală: KN46dw
+}
+function km(a, lat, lon){                           // distanța în km (haversine)
+  const R = 6371, r = x => x * Math.PI / 180;
+  const h = Math.sin(r(lat-a.lat)/2)**2 + Math.cos(r(a.lat))*Math.cos(r(lat))*Math.sin(r(lon-a.lon)/2)**2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+async function getJSON(url){
+  let r;
+  try { r = await fetch(url, {cache: 'no-cache'}); }
+  catch { throw new Error('NET'); }                 // rețea căzută sau cerere blocată
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  return await r.json();
+}
+
+// ---------- Tabel sortabil (folosit pe toate paginile) ----------
+// cols: [{k, label, num, desc, v(rând) = valoarea de sortare, cell(rând) = HTML-ul celulei, cls}]
+// st: {key, dir}; opt: {id(rând), open, detail(rând), click(id), limit, empty, redo()}
+function tabel(el, cols, rows, st, opt = {}){
+  const col = cols.find(c => c.k === st.key) || cols[0];
+  const val = (r, c) => c.v ? c.v(r) : r[c.k];
+  const sorted = [...rows].sort((a, b) => {
+    const x = val(a, col), y = val(b, col);
+    if (x == null && y == null) return 0;
+    if (x == null) return 1;                        // valorile lipsă mereu la final
+    if (y == null) return -1;
+    return (typeof x === 'string' ? x.localeCompare(y, 'ro') : x - y) * st.dir;
+  });
+  const shown = opt.limit ? sorted.slice(0, opt.limit) : sorted;
+  el.innerHTML = '<tr>' + cols.map(c => `<th class="${c.num ? 'r' : ''}${c.label ? ' s' : ''}" data-k="${c.k}">${c.label || ''}${st.key === c.k && c.label ? (st.dir > 0 ? ' ▲' : ' ▼') : ''}</th>`).join('') + '</tr>' +
+    (shown.map(r => {
+      const id = opt.id ? opt.id(r) : '', open = opt.open && id === opt.open;
+      return `<tr data-id="${esc(id)}" class="${opt.click ? 'click' : ''}${open ? ' open' : ''}">` +
+        cols.map(c => `<td class="${c.num ? 'r' : ''} ${c.cls || ''}">${c.cell ? c.cell(r) : esc(val(r, c) ?? '—')}</td>`).join('') + '</tr>' +
+        (open ? `<tr class="det"><td colspan="${cols.length}">${opt.detail(r)}</td></tr>` : '');
+    }).join('') || `<tr><td colspan="${cols.length}" class="empty">${opt.empty || ''}</td></tr>`);
+  el.querySelectorAll('th.s').forEach(th => th.onclick = () => {
+    const k = th.dataset.k, c = cols.find(c => c.k === k);
+    st.dir = st.key === k ? -st.dir : (c.asc ? 1 : c.num || c.desc ? -1 : 1);   // numerele: întâi cele mari
+    st.key = k; opt.redo();
+  });
+  if (opt.click) el.querySelectorAll('tr[data-id]').forEach(tr => tr.onclick = e => {
+    if (!e.target.closest('a, button')) opt.click(tr.dataset.id);
+  });
+  return sorted;
+}
+
+// ---------- Stare ----------
+let parks = [], lead = [], meta = null, activari = {}, spots = null, spotsAt = null, me = null;
+let byPark = {}, byCall = {};                       // date calculate din activari.json
+let view = 'acum', onlyWaiting = false;
+let map, layer, meMarker, map2, layer2, meMarker2, markers2 = {};
+const st = {                                        // ordinea de sortare a fiecărui tabel
+  home: {key: 'reference', dir: 1}, ops: {key: 'activari', dir: -1}, tparks: {key: 'qsos', dir: -1},
+  rai: {key: 'n', dir: -1}, all: {key: 'reference', dir: 1},
+};
+let tab = 'activatori', openCall = null, openPark = null;
+const mdSpots = () => (spots || []).filter(s => (s.reference || '').startsWith('MD-'));
+const liveSet = () => new Set(mdSpots().map(s => s.reference));
+
+// ---------- Date calculate: pe parc și pe activator ----------
+function calculeaza(){
+  byPark = {}; byCall = {};
+  for (const [ref, list] of Object.entries(activari)){
+    const bp = byPark[ref] = {last: null, calls: new Set(), list: []};
+    for (const a of list){
+      const call = (a.activeCallsign || '').toUpperCase(), d = isoDate(a.qso_date), q = a.totalQSOs || 0;
+      bp.list.push({d, call, q, cw: a.qsosCW || 0, ph: a.qsosPHONE || 0, data: a.qsosDATA || 0});
+      if (d && (!bp.last || d > bp.last)) bp.last = d;
+      if (call) bp.calls.add(call);
+      const bc = byCall[call] ||= {first: null, parks: {}, cw: 0, ph: 0, data: 0};
+      if (d && (!bc.first || d < bc.first)) bc.first = d;
+      bc.cw += a.qsosCW || 0; bc.ph += a.qsosPHONE || 0; bc.data += a.qsosDATA || 0;
+      const pp = bc.parks[ref] ||= {n: 0, q: 0};
+      if (q >= QSO_MINIM) pp.n++;
+      pp.q += q;
+    }
+    bp.list.sort((a, b) => (b.d || '').localeCompare(a.d || ''));
+  }
+}
+
+// ---------- Schimbarea limbii ----------
+function setLang(l, salveaza){
+  lang = l;
+  if (salveaza) store.set('potaMdLang', l);        // doar la clic pe RO / EN
+  document.documentElement.lang = l;
+  $$('[data-t]').forEach(el => el.innerHTML = t(el.dataset.t));
+  $$('[data-t-ph]').forEach(el => el.placeholder = t(el.dataset.tPh));
+  $$('.fAct').forEach(sel => { const v = sel.value || 'all';
+    sel.innerHTML = `<option value="all">${t('fAll')}</option><option value="yes">${t('fYes')}</option><option value="no">${t('fNo')}</option>`;
+    sel.value = v; });
+  $$('.lang button').forEach(b => { b.classList.toggle('on', b.dataset.lang === l); b.setAttribute('aria-pressed', b.dataset.lang === l); });
+  fillRaionSelects(); renderLive(); updateLocInfo(); renderView(); renderCall();
+}
+$$('.lang button').forEach(b => b.onclick = () => setLang(b.dataset.lang, true));
+
+// ---------- Navigarea între pagini (#acum, #harta, #clasament, #parcuri) ----------
+function route(){
+  const [v, arg] = decodeURIComponent(location.hash.slice(1)).split('/');
+  const prev = view;
+  view = ['harta', 'clasament', 'parcuri'].includes(v) ? v : 'acum';
+  $$('.view').forEach(el => el.hidden = el.id !== 'v-' + view);
+  $('homeTitle').hidden = view !== 'acum';
+  $$('nav a.lnk').forEach(a => a.classList.toggle('on', a.dataset.v === view));
+  if (view === 'clasament'){
+    tab = ['parcuri', 'raioane'].includes(arg) ? arg : 'activatori';
+    if (arg && tab === 'activatori') openCall = arg.toUpperCase();
+  }
+  if (view === 'parcuri' && arg){                  // #parcuri/MD-0066 = deschide istoricul acelui parc
+    openPark = arg.toUpperCase(); $('pQ').value = ''; $('pAct').value = 'all'; $('pRaion').value = '';
+  }
+  renderView();
+  if (view === 'harta') focusPark(arg ? arg.toUpperCase() : null);
+  // Sus la schimbarea paginii; la istoricul unui parc, derulăm până la el
+  const row = view === 'parcuri' && arg && document.querySelector(`#allParks tr[data-id="${CSS.escape(openPark)}"]`);
+  if (row) row.scrollIntoView({block: 'center'});
+  else if (prev !== view || view !== 'clasament') window.scrollTo(0, 0);
+}
+window.addEventListener('hashchange', route);
+
+function renderView(){
+  if (!parks.length) return;
+  if (view === 'acum'){ renderKpis(); renderMap(); renderLead(); renderTop(); renderRaioane(); renderParks(); }
+  if (view === 'harta') renderMap2();
+  if (view === 'clasament') renderClasament();
+  if (view === 'parcuri') renderAllParks();
+}
+
+// ---------- Banda live ----------
+function renderLive(){
+  const box = $('band'), list = mdSpots().sort((a,b) => b.spotTime.localeCompare(a.spotTime));
+  const when = spotsAt ? `<span class="when">${t('checked')(spotsAt.toLocaleTimeString(t('locale'), {hour:'2-digit', minute:'2-digit'}))}</span>` : '';
+  box.classList.toggle('on', list.length > 0);
+  if (list.length){
+    const H = t('spotHead');
+    box.innerHTML = `<span class="dot"></span><b>${t('liveOn')(list.length)}</b>${when}
+      <table><tr><th>${H[0]}</th><th class="r">${H[1]}</th><th>${H[2]}</th><th>${H[3]}</th><th class="r">${H[4]}</th></tr>` +
+      list.map(s => `<tr><td><b>${esc(s.activator)}</b></td><td class="r">${esc(s.frequency)}</td><td>${esc(s.mode)}</td>
+        <td>${refTag(s.reference, true, '#harta/' + s.reference)} ${esc(s.name)}</td>
+        <td class="r">${t('ago')(Math.round((Date.now() - new Date(s.spotTime + 'Z')) / 60000))}</td></tr>`).join('') + '</table>';
+    return;
+  }
+  const u = meta?.ultima_activare, p = u && parks.find(x => x.reference === u.parc);
+  const last = u ? ' ' + t('lastAct')(esc(u.indicativ), refTag(u.parc), esc(p ? shortName(p.name) : ''), fmtDate(u.data)) : '';
+  box.innerHTML = `<span class="dot"></span><span><b>${spots ? t('liveNone') : t('loading')}</b>${meta ? last : ''}</span>${when}`;
+}
+
+// ---------- Încărcarea datelor zilnice ----------
+async function loadData(){
+  try {
+    const [p, m, l, a] = await Promise.all(['parcuri', 'meta', 'clasament', 'activari'].map(f => getJSON(`data/${f}.json`)));
+    parks = p.map(x => ({...x, raion: raionName(x.locationDesc)}));
+    meta = m; lead = l; activari = a;
+    calculeaza();
+    parks.forEach(x => { const b = byPark[x.reference]; x.last = b?.last || null; x.ops = b ? b.calls.size : 0; });
+    $('dataErr').textContent = '';
+    fillRaionSelects();
+    applyLocator();
+    renderLive();
+    route();
+  } catch (e) { $('dataErr').textContent = errText(e); }
+}
+
+function fillRaionSelects(){
+  const names = [...new Set(parks.map(p => p.raion))].sort((a,b) => a.localeCompare(b,'ro'));
+  $$('.fRaion').forEach(sel => { const cur = sel.value;
+    sel.innerHTML = `<option value="">${t('allRaion')}</option>` + names.map(n => `<option>${esc(n)}</option>`).join('');
+    sel.value = cur; });
+}
+
+// ---------- Locatorul vizitatorului (opțional, salvat doar local; același pe toate paginile) ----------
+function updateLocInfo(){
+  const raw = $('loc').value.trim();
+  $$('.locInfo').forEach(el => el.textContent = me ? t('locSaved') : raw ? t('locBad') : '');
+  $$('.meLegend').forEach(el => el.hidden = !me);
+}
+function applyLocator(raw = $('loc').value){
+  $$('.locIn').forEach(i => { if (i.value !== raw) i.value = raw; });
+  me = locToLatLon(raw);
+  if (me) store.set('potaMdLoc', me.loc);
+  else if (!raw.trim()) store.set('potaMdLoc', null);
+  parks.forEach(p => p.dist = me ? km(me, p.latitude, p.longitude) : null);
+  st.home = me ? {key: 'dist', dir: 1} : {key: 'reference', dir: 1};   // cu locator: cele mai apropiate primele
+  if (!me && st.all.key === 'dist') st.all = {key: 'reference', dir: 1};
+  updateLocInfo(); renderView();
+}
+$$('.locIn').forEach(i => i.addEventListener('input', () => applyLocator(i.value)));
+
+// ---------- Markerele parcurilor (aceleași pe ambele hărți) ----------
+function fisa(p){                                   // fișa scurtă care se deschide la clic pe un parc
+  const done = p.activations > 0;
+  return `<div class="fisa">${refTag(p.reference, done)}
+    <div class="nm">${esc(p.name)}</div>
+    <div class="ln">${esc(p.raion)}${me ? ` · ${p.dist.toFixed(0)} km` : ''}</div>
+    <div class="ln">${t('fActs')}: <b>${fmt(p.activations)}</b> · ${t('fQso')}: <b>${fmt(p.qsos)}</b></div>
+    <div class="ln">${t('fLast')}: ${p.last ? fmtDate(p.last) : t('fNever')}</div>
+    <div class="acts"><a href="#parcuri/${esc(p.reference)}">${t('history')}</a>
+      <a href="https://pota.app/#/park/${esc(p.reference)}" target="_blank" rel="noopener">${t('onPota')}</a></div></div>`;
+}
+function drawParks(lyr, list, store){
+  const css = getComputedStyle(document.documentElement), col = v => css.getPropertyValue(v).trim();
+  const live = liveSet();
+  // Ordinea contează: neactivatele jos, activatele deasupra, cele „în aer” deasupra tuturor
+  const grupa = p => live.has(p.reference) ? 2 : p.activations > 0 ? 1 : 0;
+  [...list].sort((a, b) => grupa(a) - grupa(b)).forEach(p => {
+    const ll = [p.latitude, p.longitude], g = grupa(p);
+    let m;
+    if (g === 0){                                   // neactivat: cerc alb cu inel maro și punct maro în centru
+      m = L.circleMarker(ll, {radius: 6, color: col('--none'), weight: 2.5, fillColor: '#fff', fillOpacity: 1});
+    } else if (g === 1){                            // activat: punct verde cu contur alb
+      m = L.circleMarker(ll, {radius: 6, color: '#fff', weight: 2, fillColor: col('--act'), fillOpacity: 1});
+    } else {                                        // în aer: punct roșu + val care pulsează
+      L.marker(ll, {icon: L.divIcon({className: '', html: '<span class="puls"></span>', iconSize: [20, 20]}), interactive: false}).addTo(lyr);
+      m = L.circleMarker(ll, {radius: 8, color: '#fff', weight: 2.5, fillColor: col('--live'), fillOpacity: 1});
+    }
+    m.addTo(lyr).bindPopup(() => fisa(p));
+    // Punctul maro din centrul cercului neactivat (desenat după cerc, ca să fie deasupra)
+    if (g === 0) L.circleMarker(ll, {radius: 2, stroke: false, fillColor: col('--none'), fillOpacity: 1, interactive: false}).addTo(lyr);
+    if (store) store[p.reference] = m;
+  });
+}
+function meDot(m, old){
+  if (old) old.remove();
+  if (!me) return null;
+  const css = getComputedStyle(document.documentElement);
+  return L.circleMarker([me.lat, me.lon], {radius: 7, color: '#fff', weight: 2, fillColor: css.getPropertyValue('--me').trim(),
+    fillOpacity: 1, pane: 'markerPane'}).addTo(m).bindPopup(esc(me.loc));
+}
+function newMap(id){
+  const m = L.map(id, {scrollWheelZoom: false});   // rotița mouse-ului derulează pagina, nu harta
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19, attribution: `&copy; <a href="${OSM}">OpenStreetMap</a>`}).addTo(m);
+  m.fitBounds(parks.map(p => [p.latitude, p.longitude]), {padding: [12, 12]});
+  m.on('focus', () => m.scrollWheelZoom.enable());
+  return m;
+}
+
+// ---------- Pagina Acum: harta mică și cifrele ----------
+function renderMap(){
+  if (!window.L){ $('map').innerHTML = `<div class="err" style="padding:12px">${t('errMap')}</div>`; return; }
+  if (!map) map = newMap('map');
+  else map.invalidateSize();
+  if (layer) layer.remove();
+  layer = L.layerGroup().addTo(map);
+  drawParks(layer, onlyWaiting ? parks.filter(p => !(p.activations > 0) || liveSet().has(p.reference)) : parks);
+  meMarker = meDot(map, meMarker);
+}
+function renderKpis(){
+  const act = parks.filter(p => p.activations > 0).length;
+  const pct = Math.round(act * 100 / parks.length);
+  const qso = parks.reduce((s,p) => s + (p.qsos||0), 0);
+  const ops = lead.filter(r => r.activari > 0).length;
+  $('kpis').innerHTML = `
+    <div><span class="n">${fmt(parks.length)}</span><div class="lbl">${t('kTotal')}</div></div>
+    <div><span class="n">${fmt(act)}</span><div class="lbl">${t('kAct')(pct)}</div><div class="bar"><i style="width:${pct}%"></i></div></div>
+    <div class="wait"><span class="n">${fmt(parks.length - act)}</span><div class="lbl">${t('kWait')}</div>
+      <button class="linkbtn" id="btnWait">${onlyWaiting ? t('showAll') : t('showWait')}</button></div>
+    <div class="pair"><div><span class="n">${fmt(qso)}</span><div class="lbl">${t('kQso')}</div></div>
+      <div><span class="n">${fmt(ops)}</span><div class="lbl">${t('kOps')}</div></div></div>`;
+  // „Vezi pe hartă”: lasă pe hartă doar parcurile neactivate
+  $('btnWait').onclick = () => { onlyWaiting = !onlyWaiting; renderKpis(); renderMap(); $('h-harta').scrollIntoView({behavior: 'smooth'}); };
+}
+
+// ---------- Pagina Acum: rezumatele ----------
+function renderLead(){
+  const H = t('leadHead');
+  $('lead').innerHTML = `<tr><th>${H[0]}</th><th>${H[1]}</th><th class="r">${H[2]}</th><th class="r">${H[3]}</th><th class="r">${H[4]}</th></tr>` +
+    lead.slice(0, TOP).map((r,i) => `<tr><td class="rank">${i+1}</td>
+      <td><button class="call" data-call="${esc(r.indicativ)}">${esc(r.indicativ)}</button></td>
+      <td class="r">${r.activari}</td><td class="r">${r.parcuri}</td><td class="r">${fmt(r.qso)}</td></tr>`).join('');
+  $('lead').querySelectorAll('[data-call]').forEach(b => b.onclick = () => {
+    $('call').value = b.dataset.call; showCall(); $('indicativ').scrollIntoView({behavior: 'smooth'});
+  });
+}
+function renderTop(){
+  const H = t('topHead');
+  const rows = parks.filter(p => p.qsos > 0).sort((a,b) => b.qsos - a.qsos).slice(0, TOP);
+  $('top').innerHTML = `<tr><th>${H[0]}</th><th>${H[1]}</th><th class="r">${H[2]}</th></tr>` +
+    rows.map(p => `<tr><td>${refTag(p.reference)}</td><td class="name" title="${esc(p.name)}">${esc(shortName(p.name))}</td>
+      <td class="r">${fmt(p.qsos)}</td></tr>`).join('');
+}
+function raionStats(){
+  const g = {};
+  parks.forEach(p => { const r = g[p.raion] ||= {raion: p.raion, n: 0, a: 0, acts: 0, q: 0};
+    r.n++; if (p.activations > 0) r.a++; r.acts += p.activations || 0; r.q += p.qsos || 0; });
+  return Object.values(g).map(r => ({...r, pct: Math.round(r.a * 100 / r.n)}));
+}
+function renderRaioane(){
+  const rows = raionStats().sort((a,b) => b.n - a.n || a.raion.localeCompare(b.raion, 'ro')).slice(0, 10);
+  $('raioane').innerHTML = rows.map(r => `<div>${esc(r.raion)} <span>${r.a}/${r.n}</span>
+    <div class="bar"><i style="width:${r.pct}%"></i></div></div>`).join('');
+}
+// Filtrul comun al căutărilor de parcuri
+function filtreaza(q, fa, fr){
+  q = q.trim().toLowerCase();
+  return parks.filter(p =>
+    (!q || p.name.toLowerCase().includes(q) || p.reference.toLowerCase().includes(q)) &&
+    (fa === 'all' || (fa === 'yes') === (p.activations > 0)) &&
+    (!fr || p.raion === fr));
+}
+// Coloanele tabelului de parcuri (pe pagina Acum și pe pagina Parcuri)
+function parkCols(extra){
+  const live = liveSet();
+  return [
+    {k: 'reference', label: t('cRef'), cell: p => refTag(p.reference, p.activations > 0)},
+    {k: 'name', label: t('cPark'), cell: p => esc(p.name) + (live.has(p.reference) ? '<span class="tag live">LIVE</span>' : '')},
+    {k: 'raion', label: t('cRaion')},
+    ...(me ? [{k: 'dist', label: t('cKm'), num: 1, asc: 1, cell: p => p.dist.toFixed(0)}] : []),
+    {k: 'activations', label: t('cActs'), num: 1, cell: p => fmt(p.activations)},
+    {k: 'qsos', label: t('cQso'), num: 1, cell: p => fmt(p.qsos)},
+    ...(extra ? [{k: 'last', label: t('cLast'), desc: 1, cls: 'dt', cell: p => p.last ? fmtDate(p.last) : '—'}] : []),
+  ];
+}
+function renderParks(){
+  const q = $('q').value, fa = $('fAct').value, fr = $('fRaion').value;
+  const filtered = q.trim() || fa !== 'all' || fr;
+  tabel($('parks'), parkCols(), filtreaza(q, fa, fr), st.home,
+    {limit: filtered ? 0 : TOP, empty: t('noParks'), redo: renderParks});
+  $('parksAllLink').textContent = t('parksAll')(parks.length);
+}
+['q', 'fAct', 'fRaion'].forEach(id => $(id).addEventListener('input', renderParks));
+
+// ---------- Pagina Hartă ----------
+function renderMap2(){
+  if (!window.L){ $('map2').innerHTML = `<div class="err" style="padding:12px">${t('errMap')}</div>`; return; }
+  if (!map2) map2 = newMap('map2');
+  else map2.invalidateSize();
+  const live = liveSet(), q = $('mQ').value.trim().toLowerCase(), fr = $('mRaion').value;
+  const list = parks.filter(p => {
+    const g = live.has(p.reference) ? 'live' : p.activations > 0 ? 'act' : 'no';
+    return ((g === 'act' && $('cbAct').checked) || (g === 'no' && $('cbNo').checked) || (g === 'live' && $('cbLive').checked)) &&
+      (!fr || p.raion === fr) && (!q || p.name.toLowerCase().includes(q) || p.reference.toLowerCase().includes(q));
+  });
+  if (layer2) layer2.remove();
+  layer2 = L.layerGroup().addTo(map2);
+  markers2 = {};
+  drawParks(layer2, list, markers2);
+  meMarker2 = meDot(map2, meMarker2);
+  $('mCount').textContent = t('mapCount')(list.length);
+}
+// #harta/MD-0066: centrăm harta pe parc și îi deschidem fișa
+function focusPark(ref){
+  if (!map2) return;
+  setTimeout(() => {                                // după ce harta își ia dimensiunea reală
+    map2.invalidateSize();
+    const m = ref && markers2[ref];
+    if (m){ map2.setView(m.getLatLng(), 11); m.openPopup(); }
+  }, 50);
+}
+['cbAct', 'cbNo', 'cbLive', 'mRaion', 'mQ'].forEach(id => $(id).addEventListener('input', renderMap2));
+
+// ---------- Pagina Clasament ----------
+function renderClasament(){
+  $$('.tabs a').forEach(a => a.classList.toggle('on', a.dataset.tab === tab));
+  $('tabNote').textContent = t({activatori: 'noteOps', parcuri: 'noteParks', raioane: 'noteRaion'}[tab]);
+  const el = $('bigTable');
+  if (tab === 'activatori'){
+    const rank = Object.fromEntries(lead.map((r, i) => [r.indicativ, i + 1]));
+    const rows = lead.map(r => ({...r, prima: byCall[r.indicativ]?.first || null, rank: rank[r.indicativ]}));
+    tabel(el, [
+      {k: 'rank', label: t('cRank'), asc: 1, cls: 'rank'},
+      {k: 'indicativ', label: t('cCall'), cell: r => `<b>${esc(r.indicativ)}</b>`},
+      {k: 'activari', label: t('cActs'), num: 1},
+      {k: 'tentative', label: t('cTent'), num: 1},
+      {k: 'parcuri', label: t('cParks'), num: 1},
+      {k: 'qso', label: t('cQso'), num: 1, cell: r => fmt(r.qso)},
+      {k: 'prima', label: t('cFirst'), desc: 1, cls: 'dt', cell: r => fmtDate(r.prima)},
+      {k: 'ultima', label: t('cLast'), desc: 1, cls: 'dt', cell: r => fmtDate(r.ultima)},
+    ], rows, st.ops, {id: r => r.indicativ, open: openCall, detail: detaliuActivator, redo: renderClasament,
+      click: id => { openCall = openCall === id ? null : id; renderClasament(); }});
+    const b = el.querySelector('.det button.go');
+    if (b) b.onclick = () => { b.disabled = true; loadProfile(openCall, renderClasament); };
+  }
+  if (tab === 'parcuri'){
+    const rows = parks.filter(p => byPark[p.reference]);
+    tabel(el, [
+      {k: 'reference', label: t('cRef'), cell: p => refTag(p.reference, p.activations > 0)},
+      {k: 'name', label: t('cPark'), cls: 'name', cell: p => `<span title="${esc(p.name)}">${esc(shortName(p.name))}</span>`},
+      {k: 'raion', label: t('cRaion')},
+      {k: 'activations', label: t('cActs'), num: 1},
+      {k: 'qsos', label: t('cQso'), num: 1, cell: p => fmt(p.qsos)},
+      {k: 'ops', label: t('cOps'), num: 1},
+      {k: 'last', label: t('cLast'), desc: 1, cls: 'dt', cell: p => fmtDate(p.last)},
+    ], rows, st.tparks, {id: p => p.reference, redo: renderClasament,
+      click: id => { location.hash = '#parcuri/' + id; }});
+  }
+  if (tab === 'raioane'){
+    tabel(el, [
+      {k: 'raion', label: t('cRaion'), cell: r => `<b>${esc(r.raion)}</b>`},
+      {k: 'n', label: t('cParks'), num: 1},
+      {k: 'a', label: t('cActd'), num: 1},
+      {k: 'pct', label: t('cPct'), num: 1, cell: r => r.pct + '%'},
+      {k: 'bar', cell: r => `<div class="bar mini"><i style="width:${r.pct}%"></i></div>`},
+      {k: 'acts', label: t('cActs'), num: 1},
+      {k: 'q', label: t('cQso'), num: 1, cell: r => fmt(r.q)},
+    ], raionStats(), st.rai, {redo: renderClasament});
+  }
+}
+function detaliuActivator(r){
+  const pk = Object.entries(byCall[r.indicativ]?.parks || {}).sort((a, b) => b[1].n - a[1].n || b[1].q - a[1].q);
+  const p = glData[r.indicativ];
+  // Parcurile cu doar tentative (sub 10 QSO) apar cu plăcuță maro și nu intră în număr
+  return `<h3>${t('opsParks')(pk.filter(([, x]) => x.n > 0).length)}</h3>
+    <div class="chips">${pk.map(([ref, x]) => `<span>${refTag(ref, x.n > 0)}<small>${x.n > 0 ? x.n + '× · ' : ''}${fmt(x.q)} QSO${x.n > 0 ? '' : ' · ' + t('under10')}</small></span>`).join('')}</div>
+    <div class="links">${p ? '' : `<button class="go">${t('globalBtn')}</button>`}</div>
+    ${p ? `<div class="cards" style="grid-template-columns:minmax(0,560px);margin-top:12px">${glCard(r.indicativ, p)}</div>` : ''}`;
+}
+
+// ---------- Pagina Parcuri ----------
+function renderAllParks(){
+  $('parksTitle').textContent = t('parksTitle')(parks.length);
+  tabel($('allParks'), parkCols(true), filtreaza($('pQ').value, $('pAct').value, $('pRaion').value), st.all,
+    {id: p => p.reference, open: openPark, detail: istoricParc, empty: t('noParks'), redo: renderAllParks,
+     click: id => { openPark = openPark === id ? null : id; renderAllParks(); }});
+}
+function istoricParc(p){
+  const h = byPark[p.reference]?.list || [];
+  const links = `<div class="links"><a href="#harta/${esc(p.reference)}">${t('showOnMap')}</a>
+    <a href="https://pota.app/#/park/${esc(p.reference)}" target="_blank" rel="noopener">${t('onPota')}</a></div>`;
+  if (!h.length) return `<h3>${t('history')}</h3><div class="empty" style="padding:0">${t('histNone')}</div>${links}`;
+  return `<h3>${t('history')}</h3>
+    <table><tr><th>${t('hDate')}</th><th>${t('hOp')}</th><th class="r">${t('hQso')}</th><th class="r">${t('hCw')}</th><th class="r">${t('hPh')}</th><th class="r">${t('hData')}</th></tr>` +
+    h.map(a => `<tr><td class="dt">${fmtDate(a.d)}</td><td><b>${esc(a.call)}</b></td>
+      <td class="r">${fmt(a.q)}${a.q < QSO_MINIM ? `<span class="small">${t('under10')}</span>` : ''}</td>
+      <td class="r">${a.cw || '—'}</td><td class="r">${a.ph || '—'}</td><td class="r">${a.data || '—'}</td></tr>`).join('') +
+    `</table>${links}`;
+}
+['pQ', 'pAct', 'pRaion'].forEach(id => $(id).addEventListener('input', renderAllParks));
+
+// ---------- Spoturi live (doar cât timp pagina e vizibilă) ----------
+let spotTimer = null;
+async function loadSpots(){
+  try {
+    spots = await getJSON(API + '/v1/spots');
+    spotsAt = new Date();
+    renderLive(); renderView();
+  } catch { /* fără spoturi: banda rămâne cu ultima activare cunoscută */ }
+}
+function startSpots(){ if (!spotTimer){ loadSpots(); spotTimer = setInterval(loadSpots, SPOT_REFRESH * 1000); } }
+function stopSpots(){ clearInterval(spotTimer); spotTimer = null; }
+// Fila ascunsă = nu mai cerem spoturi (mai puține cereri la pota.app)
+document.addEventListener('visibilitychange', () => document.hidden ? stopSpots() : startSpots());
+
+// ---------- Statistici indicativ (o cerere, doar la clic) ----------
+// Cartonașul Moldova: doar din fișierele zilnice, fără nicio cerere la pota.app
+function mdCard(call){
+  const i = lead.findIndex(r => r.indicativ === call), r = lead[i], bc = byCall[call];
+  const head = `<div class="hd"><b>${t('mdCard')}</b>${r && r.activari > 0 ? `<small>${t('rankMd')(i + 1)}</small>` : ''}</div>`;
+  if (!r || !bc) return `<div class="card">${head}<div class="empty" style="padding:4px 0">${t('mdNone')}</div></div>`;
+  const K = t('mdKpi'), tot = (bc.cw + bc.ph + bc.data) || 1;
+  const pk = Object.entries(bc.parks).filter(([, x]) => x.n > 0).sort((a, b) => b[1].n - a[1].n || b[1].q - a[1].q);
+  const v = [r.activari, r.parcuri, r.qso, r.tentative];
+  return `<div class="card">${head}
+    <div class="stats">${v.map((x, k) => `<div><span class="n">${fmt(x)}</span><small>${K[k]}</small></div>`).join('')}
+      <div><span class="n d">${fmtDate(bc.first)}</span><small>${K[4]}</small></div>
+      <div><span class="n d">${fmtDate(r.ultima)}</span><small>${K[5]}</small></div></div>
+    <div class="row">${t('modes')}: <b>DATA ${fmt(bc.data)}</b> · <b>${t('phone')} ${fmt(bc.ph)}</b> · <b>CW ${fmt(bc.cw)}</b>
+      <div class="split"><i style="width:${bc.data * 100 / tot}%;background:var(--act)"></i><i style="width:${bc.ph * 100 / tot}%;background:#a5c393"></i><i style="width:${bc.cw * 100 / tot}%;background:var(--hi)"></i></div></div>
+    ${pk.length ? `<div class="row">${t('topOf')}</div>
+      <div class="chips" style="margin-top:6px">${pk.slice(0, 6).map(([ref, x]) => `<span>${refTag(ref)}<small>${x.n}×</small></span>`).join('')}</div>
+      <a class="more" href="#clasament/${esc(call)}">${t('allOf')(pk.length)}</a>` : ''}
+    <div class="note">${t('mdNote')(fmtDate(meta?.actualizat_utc?.slice(0, 10)))}</div></div>`;
+}
+// Cartonașul Global: din profilul public pota.app (/profile), doar activările valide
+function glCard(call, prof){
+  const head = `<div class="hd"><b>${t('glCard')}</b><small>${t('glSub')}</small></div>`;
+  if (!prof) return `<div class="card gl">${head}<div class="empty" style="padding:4px 0">${t('loading')}</div></div>`;
+  if (prof.err) return `<div class="card gl">${head}<div class="err">${esc(prof.err)}</div></div>`;
+  const s = prof.stats || {}, a = s.activator || {}, at = s.attempts || {}, h = s.hunter || {}, K = t('glKpi');
+  const r = lead.find(x => x.indicativ === call), mdP = r ? r.parcuri : 0, mdA = r ? r.activari : 0;
+  const out = Math.max(0, (a.parks || 0) - mdP), outA = Math.max(0, (a.activations || 0) - mdA);
+  const totP = Math.max(1, a.parks || 0);
+  const v = [a.activations, a.parks, a.qsos, h.parks, h.qsos, s.awards];
+  return `<div class="card gl">${head}
+    <div class="stats">${v.map((x, k) => `<div><span class="n">${fmt(x)}</span><small>${K[k]}</small></div>`).join('')}</div>
+    ${a.parks ? `<div class="row">${t('split')}
+      <div class="split"><i style="width:${Math.min(100, mdP * 100 / totP)}%;background:var(--act)"></i><i style="width:${out * 100 / totP}%;background:var(--me)"></i></div>
+      <b style="color:var(--act)">${t('inMd')(mdP)}</b> · <b style="color:var(--me)">${t('elsewhere')(out, outA)}</b></div>` : ''}
+    <div class="row">${t('tentRow')(Math.max(0, (at.activations || 0) - (a.activations || 0)), Math.max(0, (at.parks || 0) - (a.parks || 0)))}</div>
+    <div class="note">${t('glNote')}</div></div>`;
+}
+// Profilurile cerute deja rămân în memorie, ca să nu cerem de două ori același indicativ
+const glData = {};
+async function loadProfile(call, after){
+  if (!glData[call]){
+    try { glData[call] = await getJSON(API + '/profile/' + encodeURIComponent(call)); }
+    catch (e) { glData[call] = {err: e.message === 'HTTP 404' ? t('callNone') : errText(e)}; }
+  }
+  after();
+}
+let callShown = null;
+function renderCall(){
+  if (!callShown) return;
+  const c = callShown, p = glData[c];
+  const name = p && !p.err ? ` <span>${esc(p.name)} · ${esc(p.qth)}</span>` : '';
+  $('callBox').innerHTML = `<div class="who"><b>${esc(c)}</b>${name}</div><div class="cards">${mdCard(c)}${glCard(c, p)}</div>`;
+}
+function showCall(){
+  const c = $('call').value.trim().toUpperCase(); if (!c) return;
+  callShown = c; renderCall();                      // Moldova apare imediat, Global după răspuns
+  loadProfile(c, renderCall);
+}
+$('btnCall').onclick = showCall;
+$('call').onkeydown = e => { if (e.key === 'Enter') showCall(); };
+
+// ---------- Pornire ----------
+$('loc').value = store.get('potaMdLoc') || '';
+setLang(lang);
+loadData();
+if (!document.hidden) startSpots();
+</script>
+</body>
+</html>

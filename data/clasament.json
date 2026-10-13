@@ -1,0 +1,74 @@
+[
+ {
+  "indicativ": "ER1SKI",
+  "activari": 84,
+  "tentative": 4,
+  "qso": 1527,
+  "parcuri": 62,
+  "ultima": "2026-09-12"
+ },
+ {
+  "indicativ": "SQ9MDF",
+  "activari": 11,
+  "tentative": 0,
+  "qso": 888,
+  "parcuri": 11,
+  "ultima": "2026-08-03"
+ },
+ {
+  "indicativ": "SQ9NOT",
+  "activari": 11,
+  "tentative": 1,
+  "qso": 214,
+  "parcuri": 11,
+  "ultima": "2026-08-03"
+ },
+ {
+  "indicativ": "ER1TX",
+  "activari": 8,
+  "tentative": 0,
+  "qso": 90,
+  "parcuri": 8,
+  "ultima": "2026-08-02"
+ },
+ {
+  "indicativ": "ER1PL",
+  "activari": 7,
+  "tentative": 0,
+  "qso": 569,
+  "parcuri": 1,
+  "ultima": "2026-09-27"
+ },
+ {
+  "indicativ": "HB9GUX",
+  "activari": 4,
+  "tentative": 0,
+  "qso": 155,
+  "parcuri": 4,
+  "ultima": "2025-09-10"
+ },
+ {
+  "indicativ": "3Z3GF",
+  "activari": 4,
+  "tentative": 0,
+  "qso": 67,
+  "parcuri": 4,
+  "ultima": "2026-06-06"
+ },
+ {
+  "indicativ": "DL4MFM",
+  "activari": 3,
+  "tentative": 0,
+  "qso": 34,
+  "parcuri": 3,
+  "ultima": "2026-08-28"
+ },
+ {
+  "indicativ": "SP7FSA",
+  "activari": 2,
+  "tentative": 0,
+  "qso": 33,
+  "parcuri": 1,
+  "ultima": "2026-03-07"
+ }
+]

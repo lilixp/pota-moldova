@@ -1,0 +1,77 @@
+# Actualizează datele POTA o dată pe zi și publică pagina pe GitHub Pages.
+#
+# Pornește:
+#   - zilnic, la 03:23 UTC (06:23 ora Moldovei vara);
+#   - manual, din fila Actions → „Run workflow”;
+#   - la fiecare modificare trimisă pe GitHub (atunci doar republică pagina, fără cereri la API).
+
+name: Actualizează datele și publică pagina
+
+on:
+  schedule:
+    - cron: "23 3 * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write    # ca să poată salva fișierele din data/
+  pages: write       # ca să poată publica pe GitHub Pages
+  id-token: write
+
+# Nu rulăm două actualizări deodată
+concurrency:
+  group: pota-md
+  cancel-in-progress: false
+
+jobs:
+  date:
+    name: Colectează datele
+    if: github.event_name != 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Rulează colectorul
+        run: python scripts/colecteaza.py
+
+      - name: Salvează datele noi în repository
+        if: always()   # salvăm și ce s-a descărcat parțial
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898333+github-actions[bot]@users.noreply.github.com"
+          git add data
+          if git diff --cached --quiet; then
+            echo "Nimic nou de salvat."
+          else
+            git commit -m "Date POTA actualizate $(date -u +%Y-%m-%d)"
+            git push
+          fi
+
+  publica:
+    name: Publică pe GitHub Pages
+    needs: date
+    # Rulează după colectare sau direct la un push (când colectarea e sărită)
+    if: ${{ !cancelled() && needs.date.result != 'failure' }}
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main    # ultima versiune, cu datele tocmai salvate
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - id: deploy
+        uses: actions/deploy-pages@v4
