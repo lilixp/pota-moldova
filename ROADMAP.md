@@ -27,7 +27,7 @@ Ordinea etapelor: **stabilizare → pagina web pentru telefon → lansare public
 
 *Testare cu activatorii din Moldova*
 
-- ⬜ Verificarea rulării zilnice automate (03:23 UTC)
+- ✅ Verificarea rulării zilnice automate (programată la 03:23 UTC; GitHub o poate porni cu câteva ore întârziere, 14.10.2026: OK)
 - ✅ Varianta pentru telefon: meniu jos cu iconuri, harta pe tot ecranul, carduri, filtre ca butoane rotunde, butonul „Sus”
 - ✅ Verificarea datelor pentru toți activatorii din clasament, față de pota.app (14.10.2026: totul corect)
 - ✅ Indicativele cu sufix sau prefix (`/P`, `YO/…`): pota.app le adună la indicativul de bază; căutarea face la fel
@@ -38,7 +38,7 @@ Ordinea etapelor: **stabilizare → pagina web pentru telefon → lansare public
 
 *După ce pagina arată bine și pe telefon.*
 
-- ⬜ Subdomeniul **potatrack.qrz.md** (CNAME → GitHub Pages, HTTPS)
+- ⬜ Subdomeniul **erpota.qrz.md** (CNAME `erpota` → `lilixp.github.io`, HTTPS)
 - ⬜ Eliminarea etichetei „versiune de test” și a setării „nu indexa”
 - ⬜ Pagina **Despre**: ce date se folosesc, cum se calculează, regulile POTA
 - ⬜ Email informativ către echipa POTA despre proiect
@@ -46,12 +46,9 @@ Ordinea etapelor: **stabilizare → pagina web pentru telefon → lansare public
 
 ## Etapa 3 – Funcții noi (v1.x) ⬜
 
-*După lansare. Începem cu raioanele colorate.*
+*„Prima activare” se face acum, înainte de lansare.*
 
-1. ⬜ **Raioanele colorate pe hartă**, după procentul de parcuri activate (prima funcție nouă)
-2. ⬜ „Prima activare” a fiecărui parc: cine și când
-3. ⬜ Noutăți: parcuri noi în listă, activatori noi, parcuri activate prima dată
-4. ⬜ Evoluția în timp: activări și QSO pe luni sau ani (grafic)
+- 🔄 **„Prima activare”** a fiecărui parc: cine și când
 
 Făcute mai devreme decât era planificat:
 
@@ -67,6 +64,8 @@ Făcute mai devreme decât era planificat:
 ## Idei pentru mai târziu 💡
 
 - 💡 Pagină separată **Hunteri** în meniu (top 5 hunteri pe parc, limita datelor de pe pota.app)
+- 💡 Noutăți: parcuri noi în listă, activatori noi (cu puțini activatori nu spun mare lucru acum)
+- 💡 Evoluția în timp: activări și QSO pe luni sau ani, grafic (la fel)
 - 💡 **Parcuri lângă mine (GPS)**: butonul „Lângă mine” arată parcurile cele mai apropiate, cu distanța; poziția rămâne doar în browser
 
 ## Etapa 4 – Durabilitate ⬜
