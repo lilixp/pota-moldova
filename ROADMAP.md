@@ -5,7 +5,7 @@ Ordinea se poate schimba în funcție de observațiile testerilor.
 
 Legendă: ✅ gata · 🔄 în lucru · ⬜ de făcut · 💡 idee, fără prioritate
 
-Ordinea etapelor: **stabilizare → varianta pentru telefon → lansare publică → funcții noi**.
+Ordinea etapelor: **stabilizare → pagina web pentru telefon → lansare publică → funcții noi → aplicație pentru telefon**.
 
 ---
 
@@ -52,6 +52,13 @@ Ordinea etapelor: **stabilizare → varianta pentru telefon → lansare publică
 2. ⬜ „Prima activare” a fiecărui parc: cine și când
 3. ⬜ Noutăți: parcuri noi în listă, activatori noi, parcuri activate prima dată
 4. ⬜ Evoluția în timp: activări și QSO pe luni sau ani (grafic)
+
+## Etapa 5 – Aplicație pentru telefon ⬜
+
+*Doar după ce toate etapele de mai sus sunt gata și pagina e oficială pe internet.*
+
+- ⬜ Alegerea formei: pagină instalabilă (PWA, icon pe ecranul principal) sau aplicație Android
+- ⬜ Aceleași date și aceleași reguli ca pagina web
 
 ## Idei pentru mai târziu 💡
 
