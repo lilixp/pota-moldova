@@ -38,8 +38,9 @@ Ordinea etapelor: **stabilizare → pagina web pentru telefon → lansare public
 
 *După ce pagina arată bine și pe telefon.*
 
-- ⬜ Subdomeniul **erpota.qrz.md** (CNAME `erpota` → `lilixp.github.io`, HTTPS)
-- ⬜ Eliminarea etichetei „versiune de test” și a setării „nu indexa”
+- ⬜ Subdomeniul **erpota.qrz.md** (CNAME `erpota` → `lilixp.github.io`, HTTPS); apoi adresele din `og:url` și `og:image` trec pe erpota.qrz.md
+- ✅ Eliminarea etichetei „versiune de test” și a setării „nu indexa”
+- ✅ Previzualizarea linkului pe Facebook / Messenger (imagine `og.png` cu harta parcurilor)
 - ⬜ Pagina **Despre**: ce date se folosesc, cum se calculează, regulile POTA
 - ⬜ Email informativ către echipa POTA despre proiect
 - ⬜ Anunț în grupurile de radioamatori

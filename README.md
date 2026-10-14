@@ -2,7 +2,7 @@
 
 Unofficial statistics for the **Parks on the Air (POTA)** parks in the Republic of Moldova (prefix ER, references `MD-xxxx`).
 
-**Live (test version):** https://lilixp.github.io/pota-moldova/ · English: https://lilixp.github.io/pota-moldova/?lang=en
+**Live:** https://lilixp.github.io/pota-moldova/ · English: https://lilixp.github.io/pota-moldova/?lang=en
 
 > **Independent project by ER1PL. Not an official POTA website and not affiliated with Parks on the Air®.**
 > All data comes from [pota.app](https://pota.app). For official data, always check pota.app.
@@ -82,7 +82,7 @@ Then open http://localhost:8000
 
 ## Status and roadmap
 
-**Test version.** See the [roadmap](ROADMAP.md) (in Romanian) for what comes next.
+See the [roadmap](ROADMAP.md) (in Romanian) for what comes next.
 
 ## Credits
 

@@ -4,9 +4,19 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ER POTA Tracker</title>
-<!-- TEST: cere motoarelor de căutare să nu afișeze pagina (se scoate la lansarea oficială) -->
-<meta name="robots" content="noindex, nofollow">
 <meta name="description" content="Statistici neoficiale pentru parcurile Parks on the Air din Republica Moldova · Unofficial statistics for Parks on the Air in the Republic of Moldova">
+<!-- Previzualizarea linkului pe Facebook, Messenger, Telegram etc. (adresele trebuie să fie complete; la lansare devin erpota.qrz.md) -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ER POTA Tracker">
+<meta property="og:title" content="ER POTA Tracker – Parcurile POTA din Moldova">
+<meta property="og:description" content="Hartă, clasament, prima activare și cine e în aer acum în parcurile POTA din Republica Moldova. Proiect independent, neoficial.">
+<meta property="og:url" content="https://lilixp.github.io/pota-moldova/">
+<meta property="og:image" content="https://lilixp.github.io/pota-moldova/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Harta parcurilor POTA din Moldova: verde = activate, roșu = neactivate">
+<meta property="og:locale" content="ro_RO">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -53,9 +63,7 @@ a.more{display:inline-block;margin-top:10px;font-size:14px;font-weight:700}
 /* ---------- Partea de sus: meniu, bandă live, titlu ---------- */
 nav{position:sticky;top:0;z-index:1000;background:var(--surface);border-bottom:1px solid var(--line)}
 nav .wrap{display:flex;align-items:center;gap:22px;height:52px}
-/* TEST: eticheta „versiune de test” de lângă titlu (se scoate la lansarea oficială) */
-.testtag{margin-left:-12px;margin-right:auto;font-size:12px;font-weight:700;color:var(--hi);background:var(--hi-soft);border:1px solid var(--hi);border-radius:99px;padding:1px 8px;white-space:nowrap}
-nav .brand{font-family:var(--head);font-weight:var(--head-w);font-size:19px;color:var(--ink);text-decoration:none}
+nav .brand{margin-right:auto;font-family:var(--head);font-weight:var(--head-w);font-size:19px;color:var(--ink);text-decoration:none}
 nav a.lnk{color:var(--muted);text-decoration:none;font-size:15px;font-weight:600;padding:14px 0;border-bottom:3px solid transparent}
 nav a.lnk:hover{color:var(--act)}
 nav a.lnk.on{color:var(--ink);border-bottom-color:var(--act)}
@@ -245,7 +253,6 @@ nav a.lnk svg{display:none}
   .wrap{padding-left:14px;padding-right:14px}
   nav .wrap{height:48px;gap:8px}
   nav .brand{font-size:17px}
-  .testtag{margin-left:0;font-size:11px}
   /* Meniul coboară jos, cu iconuri */
   nav .links{position:fixed;left:0;right:0;bottom:0;z-index:1001;display:grid;grid-template-columns:repeat(4,1fr);
     background:var(--surface);border-top:1px solid var(--line);padding:5px 0 calc(6px + env(safe-area-inset-bottom))}
@@ -329,7 +336,6 @@ footer .upd{color:var(--ink);font-weight:700;margin-bottom:6px}
 <div class="top">
   <nav><div class="wrap">
     <a class="brand" href="#acum">ER POTA Tracker</a>
-    <span class="testtag" data-t="testTag"></span>
     <!-- Pe PC: linkuri sus; pe telefon: bară fixă jos, cu iconuri -->
     <div class="links">
       <a class="lnk" href="#acum" data-v="acum"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="1.6"/><path d="M8.5 8.5a5 5 0 0 0 0 7M15.5 8.5a5 5 0 0 1 0 7M5.6 5.6a9 9 0 0 0 0 12.8M18.4 5.6a9 9 0 0 1 0 12.8"/></svg><span data-t="navNow"></span></a>
@@ -492,7 +498,6 @@ const T = {
   ro: {
     locale: 'ro-RO',
     navNow: 'Acum', navMap: 'Hartă', navLead: 'Clasament', navParks: 'Parcuri',
-    testTag: 'versiune de test',
     title: 'Parcurile POTA din Moldova',
     note: `Proiect independent, neoficial. Date de la ${POTA}, actualizate zilnic. Nu este un site oficial Parks on the Air.`,
     loading: 'Se încarcă…',
@@ -578,7 +583,6 @@ const T = {
   en: {
     locale: 'en-GB',
     navNow: 'Now', navMap: 'Map', navLead: 'Leaderboard', navParks: 'Parks',
-    testTag: 'test version',
     title: 'POTA parks in Moldova',
     note: `Independent, unofficial project. Data from ${POTA}, updated daily. This is not an official Parks on the Air website.`,
     loading: 'Loading…',
