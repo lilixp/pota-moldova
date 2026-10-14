@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Iconița ER POTA Tracker: copacii din meniu, albi pe verde de pădure -->
+  <rect width="64" height="64" rx="14" fill="#4a7a35"/>
+  <g fill="none" stroke="#fff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M22 10L11 29h7l-6 11h20l-6-11h7z"/>
+    <path d="M22 40v14M43 54v-10"/>
+    <path d="M43 19l-9 15h6l-5 10h16l-5-10h6z"/>
+  </g>
+</svg>

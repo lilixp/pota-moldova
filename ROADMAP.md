@@ -30,8 +30,8 @@ Ordinea etapelor: **stabilizare → pagina web pentru telefon → lansare public
 - ⬜ Verificarea rulării zilnice automate (03:23 UTC)
 - ✅ Varianta pentru telefon: meniu jos cu iconuri, harta pe tot ecranul, carduri, filtre ca butoane rotunde, butonul „Sus”
 - ✅ Verificarea datelor pentru toți activatorii din clasament, față de pota.app (14.10.2026: totul corect)
-- ⬜ Indicativele cu sufix sau prefix (`/P`, `YO/…`): cum se adună la indicativul de bază
-- ⬜ Mențiune clară pe pagină: datele se actualizează o dată pe zi
+- ✅ Indicativele cu sufix sau prefix (`/P`, `YO/…`): pota.app le adună la indicativul de bază; căutarea face la fel
+- ✅ Mențiune clară pe pagină: data ultimei actualizări în subsol, datele se actualizează o dată pe zi
 - ⬜ Rezolvarea observațiilor de la testeri
 
 ## Etapa 2 – Lansare publică (v1.0) ⬜
