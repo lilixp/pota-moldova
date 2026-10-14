@@ -18,7 +18,7 @@
   --act:#4a7a35; --act-soft:#e1ead7;     /* parc activat: verde de pădure pe hartă */
   --none:#7a5228; --none-fill:#f3eadf;   /* neactivat: maro de curbă de nivel */
   --live:#c8322b; --live-soft:#fbeceb;   /* în aer acum */
-  --me:#2f6f9f;                          /* locatorul vizitatorului: albastru de apă */
+  --me:#2f6f9f;                          /* albastru de apă: cartonașul Global */
   --hi:#8a5a2b; --hi-soft:#f3eadf;       /* „așteaptă prima activare” */
   --head:"Bitter",Georgia,serif; --body:"Source Sans 3",system-ui,sans-serif;
   --head-w:700; --radius:4px;
@@ -98,12 +98,11 @@ nav a.lnk.on{color:var(--ink);border-bottom-color:var(--act)}
 /* Semnele din legendă, identice cu markerele de pe hartă */
 .mk.act{background:var(--act);box-shadow:0 0 0 2px #fff}
 .mk.no{width:13px;height:13px;border:2.5px solid var(--none);background:radial-gradient(circle,var(--none) 0 2px,#fff 2.5px)}
-.mk.live{background:var(--live)} .mk.me{background:var(--me)}
+.mk.live{background:var(--live)}
 /* Valul care pulsează în jurul unui parc „în aer acum” */
 .puls{display:block;width:16px;height:16px;border-radius:50%;border:2px solid var(--live);animation:val 1.8s ease-out infinite}
 @keyframes val{from{transform:scale(1);opacity:.8}to{transform:scale(2.3);opacity:0}}
 @media (prefers-reduced-motion:reduce){.puls{animation:none;transform:scale(1.8);opacity:.45}}
-.loc{margin-left:auto;display:flex;align-items:center;gap:8px}
 
 /* Fișa unui parc (pe hartă) */
 .fisa{min-width:200px}
@@ -119,6 +118,8 @@ nav a.lnk.on{color:var(--ink);border-bottom-color:var(--act)}
 .side input[type=checkbox]{width:17px;height:17px;accent-color:var(--act);margin:0}
 .side select,.side input[type=search],.side input[type=text]{width:100%}
 .side .cnt{color:var(--muted);font-size:14px}
+.sidehd{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.sidehd b{font:700 18px var(--head)}
 #map2{height:calc(100vh - 210px);min-height:480px;border:1px solid var(--line);border-radius:var(--radius);background:var(--line)}
 
 /* ---------- Tabele ---------- */
@@ -170,7 +171,6 @@ button.call:hover{color:var(--act);text-decoration:underline}
 .tools{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;align-items:center}
 input,select{font:inherit;font-size:15px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:8px 11px}
 input::placeholder{color:var(--muted)}
-input.locIn{width:96px;text-transform:uppercase}
 button.go{font:700 15px var(--body);background:var(--act);color:var(--surface);border:1px solid var(--act);border-radius:var(--radius);padding:8px 16px;cursor:pointer}
 .tag{font-size:12px;font-weight:700;padding:0 6px;border-radius:99px;margin-left:6px}
 .tag.live{background:var(--live);color:#fff}
@@ -267,13 +267,12 @@ nav a.lnk svg{display:none}
   .kp .pair>div{background:var(--surface);padding:10px 12px}
   .kp .pair .n{font-size:30px}
   .under{gap:8px 14px}
-  .loc{margin-left:0}
   table{font-size:14px}
   th,td{padding:7px 6px}
   /* Filtre ca butoane rotunde */
   select.fAct{display:none}
   .fchips{display:flex}
-  .tools input:not(.locIn){min-width:0 !important;flex:1 1 100% !important}   /* câmpul de căutare pe tot rândul */
+  .tools input{min-width:0 !important;flex:1 1 100% !important}   /* câmpul de căutare pe tot rândul */
   .tools input,.tools select{border-radius:99px}
   .tools select{flex:1}
   .tabs{border:0;gap:8px;flex-wrap:wrap}
@@ -359,14 +358,8 @@ footer p{margin:0;max-width:85ch}
       <li><span class="mk act"></span><span data-t="lgAct"></span></li>
       <li><span class="mk no"></span><span data-t="lgNo"></span></li>
       <li><span class="mk live"></span><span data-t="lgLive"></span></li>
-      <li class="meLegend" hidden><span class="mk me"></span><span data-t="lgMe"></span></li>
     </ul>
     <a href="#harta" style="font-weight:700" data-t="openBigMap"></a>
-    <div class="loc">
-      <label for="loc" data-t="locLabel"></label>
-      <input id="loc" class="locIn" placeholder="KN47" maxlength="6" autocomplete="off">
-      <span class="locInfo"></span>
-    </div>
   </div>
   <div class="err" id="dataErr"></div>
 
@@ -424,6 +417,8 @@ footer p{margin:0;max-width:85ch}
   <div class="ptitle"><h1 data-t="mapPageTitle"></h1></div>
   <div class="bigmap">
     <aside class="side" id="side">
+      <!-- Titlul panoului + „Resetează filtrele” (apare doar când un filtru e schimbat) -->
+      <div class="sidehd"><b data-t="filters"></b><button class="linkbtn" id="resetF" data-t="resetF" hidden></button></div>
       <div>
         <h3 data-t="mapShow"></h3>
         <div class="cbs">
@@ -434,11 +429,6 @@ footer p{margin:0;max-width:85ch}
       </div>
       <div><h3><label for="mRaion" data-t="mapRaion"></label></h3><select id="mRaion" class="fRaion"></select></div>
       <div><h3><label for="mQ" data-t="mapSearch"></label></h3><input type="search" id="mQ" data-t-ph="search" autocomplete="off"></div>
-      <div>
-        <h3><label for="mLoc" data-t="locLabel"></label></h3>
-        <input id="mLoc" class="locIn" placeholder="KN47" maxlength="6" autocomplete="off">
-        <div class="cnt locInfo" style="margin-top:4px"></div>
-      </div>
       <div class="cnt" id="mCount"></div>
       <button class="go sheetok" id="sheetOk"></button>
     </aside>
@@ -471,8 +461,6 @@ footer p{margin:0;max-width:85ch}
     <select id="pAct" class="fAct"></select>
     <div class="fchips" data-for="pAct"></div>
     <select id="pRaion" class="fRaion"></select>
-    <label for="pLoc" class="sub" style="margin:0" data-t="locLabel"></label>
-    <input id="pLoc" class="locIn" placeholder="KN47" maxlength="6" autocomplete="off">
   </div>
   <div id="allParks"></div>
 </main>
@@ -515,9 +503,8 @@ const T = {
     kWait: 'așteaptă prima activare',
     showWait: 'Vezi pe hartă', showAll: 'Arată toate parcurile pe hartă',
     kQso: 'QSO-uri', kOps: 'activatori',
-    lgAct: 'activat', lgNo: 'neactivat', lgLive: 'în aer acum', lgMe: 'locatorul tău',
+    lgAct: 'activat', lgNo: 'neactivat', lgLive: 'în aer acum',
     openBigMap: 'Deschide harta mare',
-    locLabel: 'Locatorul tău:', locBad: 'Locator invalid (ex. KN47 sau KN47ab)', locSaved: 'salvat doar în browserul tău',
     leadTitle: 'Clasament activatori',
     leadSub: 'Top 10 · activare validă: cel puțin 10 QSO-uri · clic pe indicativ pentru detalii',
     leadHead: ['', 'Indicativ', 'Activări', 'Parcuri', 'QSO'],
@@ -528,7 +515,7 @@ const T = {
     searchTitle: 'Caută un parc', search: 'Nume sau referință, de exemplu Codru',
     fAll: 'Toate', fYes: 'Doar activate', fNo: 'Doar neactivate', allRaion: 'Toate raioanele',
     // Telefon
-    toTop: 'Sus', filters: 'Filtre', close: 'Închide', sortBy: 'Sortare:',
+    toTop: 'Sus', filters: 'Filtre', resetF: 'Resetează filtrele', close: 'Închide', sortBy: 'Sortare:',
     showN: n => `Arată ${n} ${n === 1 ? 'parc' : de(n) + 'parcuri'}`,
     nActs: n => n === 1 ? '1 activare' : `${n} ${de(n)}activări`,
     moreActs: n => `încă ${n} ${n === 1 ? 'activare' : de(n) + 'activări'}`,
@@ -562,7 +549,7 @@ const T = {
     noteRaion: 'Toate raioanele, cu parcurile și activitatea lor.',
     cRank: '#', cCall: 'Indicativ', cActs: 'Activări', cTent: 'Tentative', cParks: 'Parcuri', cQso: 'QSO',
     cFirst: 'Prima', cLast: 'Ultima', cRef: 'Ref.', cPark: 'Parc', cRaion: 'Raion', cOps: 'Activatori',
-    cActd: 'Activate', cPct: '%', cKm: 'km',
+    cActd: 'Activate', cPct: '%',
     opsParks: n => `Parcuri MD activate (${n})`, globalBtn: 'Statistici POTA globale',
     // Pagina Parcuri
     parksTitle: n => `Toate cele ${n} ${de(n)}parcuri`,
@@ -595,9 +582,8 @@ const T = {
     kWait: 'waiting for their first activation',
     showWait: 'Show on map', showAll: 'Show all parks on the map',
     kQso: 'QSOs', kOps: 'activators',
-    lgAct: 'activated', lgNo: 'not activated', lgLive: 'on the air now', lgMe: 'your locator',
+    lgAct: 'activated', lgNo: 'not activated', lgLive: 'on the air now',
     openBigMap: 'Open the large map',
-    locLabel: 'Your locator:', locBad: 'Invalid locator (e.g. KN47 or KN47ab)', locSaved: 'stored only in your browser',
     leadTitle: 'Activator leaderboard',
     leadSub: 'Top 10 · valid activation: at least 10 QSOs · click a callsign for details',
     leadHead: ['', 'Callsign', 'Activations', 'Parks', 'QSOs'],
@@ -607,7 +593,7 @@ const T = {
     raionTitle: 'By district', raionSub: 'Activated parks out of total', raionAll: 'All districts',
     searchTitle: 'Find a park', search: 'Name or reference, for example Codru',
     fAll: 'All', fYes: 'Activated only', fNo: 'Not activated only', allRaion: 'All districts',
-    toTop: 'Top', filters: 'Filters', close: 'Close', sortBy: 'Sort:',
+    toTop: 'Top', filters: 'Filters', resetF: 'Reset filters', close: 'Close', sortBy: 'Sort:',
     showN: n => `Show ${n} ${n === 1 ? 'park' : 'parks'}`,
     nActs: n => n === 1 ? '1 activation' : `${n} activations`,
     moreActs: n => `${n} more`,
@@ -638,7 +624,7 @@ const T = {
     noteRaion: 'All districts, with their parks and activity.',
     cRank: '#', cCall: 'Callsign', cActs: 'Activations', cTent: 'Attempts', cParks: 'Parks', cQso: 'QSOs',
     cFirst: 'First', cLast: 'Last', cRef: 'Ref.', cPark: 'Park', cRaion: 'District', cOps: 'Activators',
-    cActd: 'Activated', cPct: '%', cKm: 'km',
+    cActd: 'Activated', cPct: '%',
     opsParks: n => `MD parks activated (${n})`, globalBtn: 'Global POTA stats',
     parksTitle: n => `All ${n} parks`,
     parksPageNote: 'Click a row for its activation history. Click a column title to sort.',
@@ -692,21 +678,6 @@ const numeRo = n => n.replace(/\s*\([^)]*\)/g, '')
   .replace(/(\s+(Landscape|Nature|National|Forest|State|Recreation|Protected|Other|Conservation|Area|Park|Reserve|Garden|Monument|Natural|Wildlife|Sanctuary|Scientific|Historic|Site|Heritage|World|Protective|Wetland))+$/i, '');
 const isoDate = d => d && d.length === 8 ? `${d.slice(0,4)}-${d.slice(4,6)}-${d.slice(6,8)}` : null;
 
-// Locator Maidenhead (4 sau 6 caractere) -> centrul pătratului, în grade
-function locToLatLon(loc){
-  const s = (loc||'').trim().toUpperCase();
-  if (!/^[A-R]{2}[0-9]{2}([A-X]{2})?$/.test(s)) return null;
-  let lon = (s.charCodeAt(0)-65)*20 - 180 + (+s[2])*2;
-  let lat = (s.charCodeAt(1)-65)*10 - 90 + (+s[3]);
-  if (s.length === 6){ lon += (s.charCodeAt(4)-65)*5/60 + 2.5/60; lat += (s.charCodeAt(5)-65)*2.5/60 + 1.25/60; }
-  else { lon += 1; lat += 0.5; }
-  return {lat, lon, loc: s.slice(0,4) + s.slice(4).toLowerCase()};   // forma uzuală: KN46dw
-}
-function km(a, lat, lon){                           // distanța în km (haversine)
-  const R = 6371, r = x => x * Math.PI / 180;
-  const h = Math.sin(r(lat-a.lat)/2)**2 + Math.cos(r(a.lat))*Math.cos(r(lat))*Math.sin(r(lon-a.lon)/2)**2;
-  return 2 * R * Math.asin(Math.sqrt(h));
-}
 async function getJSON(url){
   let r;
   try { r = await fetch(url, {cache: 'no-cache'}); }
@@ -771,10 +742,10 @@ function tabel(el, cols, rows, st, opt = {}){
 }
 
 // ---------- Stare ----------
-let parks = [], lead = [], meta = null, activari = {}, spots = null, spotsAt = null, me = null;
+let parks = [], lead = [], meta = null, activari = {}, spots = null, spotsAt = null;
 let byPark = {}, byCall = {};                       // date calculate din activari.json
 let view = 'acum', onlyWaiting = false;
-let map, layer, meMarker, map2, layer2, meMarker2, markers2 = {};
+let map, layer, map2, layer2, markers2 = {};
 const st = {                                        // ordinea de sortare a fiecărui tabel
   home: {key: 'reference', dir: 1}, ops: {key: 'activari', dir: -1}, tparks: {key: 'qsos', dir: -1},
   rai: {key: 'n', dir: -1}, all: {key: 'reference', dir: 1},
@@ -818,7 +789,7 @@ function setLang(l, salveaza){
   $$('.fchips').forEach(box => box.innerHTML = [['all', 'chAll'], ['yes', 'chYes'], ['no', 'chNo']]
     .map(([v, k]) => `<button class="chip" data-v="${v}">${t(k)}</button>`).join(''));
   syncChips();
-  fillRaionSelects(); renderLive(); updateLocInfo(); renderView(); renderCall();
+  fillRaionSelects(); renderLive(); renderView(); renderCall();
 }
 $$('.lang button').forEach(b => b.onclick = () => setLang(b.dataset.lang, true));
 // Butoanele rotunde schimbă lista ascunsă de alături (aceeași logică de filtrare ca pe PC)
@@ -900,7 +871,6 @@ async function loadData(){
     parks.forEach(x => { const b = byPark[x.reference]; x.last = b?.last || null; x.ops = b ? b.calls.size : 0; });
     $('dataErr').textContent = '';
     fillRaionSelects();
-    applyLocator();
     renderLive();
     route();
   } catch (e) { $('dataErr').textContent = errText(e); }
@@ -913,30 +883,13 @@ function fillRaionSelects(){
     sel.value = cur; });
 }
 
-// ---------- Locatorul vizitatorului (opțional, salvat doar local; același pe toate paginile) ----------
-function updateLocInfo(){
-  const raw = $('loc').value.trim();
-  $$('.locInfo').forEach(el => el.textContent = me ? t('locSaved') : raw ? t('locBad') : '');
-  $$('.meLegend').forEach(el => el.hidden = !me);
-}
-function applyLocator(raw = $('loc').value){
-  $$('.locIn').forEach(i => { if (i.value !== raw) i.value = raw; });
-  me = locToLatLon(raw);
-  if (me) store.set('potaMdLoc', me.loc);
-  else if (!raw.trim()) store.set('potaMdLoc', null);
-  parks.forEach(p => p.dist = me ? km(me, p.latitude, p.longitude) : null);
-  st.home = me ? {key: 'dist', dir: 1} : {key: 'reference', dir: 1};   // cu locator: cele mai apropiate primele
-  if (!me && st.all.key === 'dist') st.all = {key: 'reference', dir: 1};
-  updateLocInfo(); renderView();
-}
-$$('.locIn').forEach(i => i.addEventListener('input', () => applyLocator(i.value)));
 
 // ---------- Markerele parcurilor (aceleași pe ambele hărți) ----------
 function fisa(p){                                   // fișa scurtă care se deschide la clic pe un parc
   const done = p.activations > 0;
   return `<div class="fisa">${refTag(p.reference, done)}
     <div class="nm">${esc(p.name)}</div>
-    <div class="ln">${esc(p.raion)}${me ? ` · ${p.dist.toFixed(0)} km` : ''}</div>
+    <div class="ln">${esc(p.raion)}</div>
     <div class="ln">${t('fActs')}: <b>${fmt(p.activations)}</b> · ${t('fQso')}: <b>${fmt(p.qsos)}</b></div>
     <div class="ln">${t('fLast')}: ${p.last ? fmtDate(p.last) : t('fNever')}</div>
     <div class="acts"><a href="#parcuri/${esc(p.reference)}">${t('history')}</a>
@@ -965,13 +918,6 @@ function drawParks(lyr, list, store, jos){
     if (store) store[p.reference] = m;
   });
 }
-function meDot(m, old){
-  if (old) old.remove();
-  if (!me) return null;
-  const css = getComputedStyle(document.documentElement);
-  return L.circleMarker([me.lat, me.lon], {radius: 7, color: '#fff', weight: 2, fillColor: css.getPropertyValue('--me').trim(),
-    fillOpacity: 1, pane: 'markerPane'}).addTo(m).bindPopup(esc(me.loc));
-}
 function newMap(id){
   const m = L.map(id, {scrollWheelZoom: false});   // rotița mouse-ului derulează pagina, nu harta
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -989,7 +935,6 @@ function renderMap(){
   if (layer) layer.remove();
   layer = L.layerGroup().addTo(map);
   drawParks(layer, onlyWaiting ? parks.filter(p => !(p.activations > 0) || liveSet().has(p.reference)) : parks);
-  meMarker = meDot(map, meMarker);
 }
 function renderKpis(){
   const act = parks.filter(p => p.activations > 0).length;
@@ -1051,7 +996,6 @@ function parkCols(extra){
     {k: 'reference', label: t('cRef'), cell: p => refTag(p.reference, p.activations > 0)},
     {k: 'name', label: t('cPark'), cell: p => esc(p.name) + (live.has(p.reference) ? '<span class="tag live">LIVE</span>' : '')},
     {k: 'raion', label: t('cRaion')},
-    ...(me ? [{k: 'dist', label: t('cKm'), num: 1, asc: 1, cell: p => p.dist.toFixed(0)}] : []),
     {k: 'activations', label: t('cActs'), num: 1, cell: p => fmt(p.activations)},
     {k: 'qsos', label: t('cQso'), num: 1, cell: p => fmt(p.qsos)},
     ...(extra ? [{k: 'last', label: t('cLast'), desc: 1, cls: 'dt', cell: p => p.last ? fmtDate(p.last) : '—'}] : []),
@@ -1061,7 +1005,7 @@ function parkCols(extra){
 function parkCard(p, extra){
   const done = p.activations > 0, live = liveSet().has(p.reference);
   return `<div class="t">${refTag(p.reference, done)}<b>${esc(numeRo(p.name))}</b>${live ? '<span class="tag live">LIVE</span>' : ''}</div>
-    <div class="m">${esc(p.raion)}${me ? ` · ${p.dist.toFixed(0)} km` : ''} · ${done ? `${t('nActs')(p.activations)} · ${fmt(p.qsos)} QSO` : t('fNever')}</div>` +
+    <div class="m">${esc(p.raion)} · ${done ? `${t('nActs')(p.activations)} · ${fmt(p.qsos)} QSO` : t('fNever')}</div>` +
     (extra && p.last ? `<div class="m">${t('cLast').toLowerCase()} ${fmtDate(p.last)}</div>` : '');
 }
 let homeShown = TOP;                                // câte parcuri arată lista de pe pagina Acum
@@ -1096,9 +1040,11 @@ function renderMap2(){
   layer2 = L.layerGroup().addTo(map2);
   markers2 = {};
   drawParks(layer2, list, markers2, mobil);
-  meMarker2 = meDot(map2, meMarker2);
   $('mCount').textContent = t('mapCount')(list.length);
-  $('fabTxt').textContent = `${t('filters')} · ${t('mapCount')(list.length).replace(/ pe hartă| on the map/, '')}`;
+  // Câte filtre sunt schimbate față de „tot” (pentru „Filtre (2)” și „Resetează filtrele”)
+  const nF = ['cbAct', 'cbNo', 'cbLive'].filter(id => !$(id).checked).length + (fr ? 1 : 0) + (q ? 1 : 0);
+  $('resetF').hidden = nF === 0;
+  $('fabTxt').textContent = `${t('filters')}${nF ? ` (${nF})` : ''} · ${t('mapCount')(list.length).replace(/ pe hartă| on the map/, '')}`;
   $('sheetOk').textContent = t('showN')(list.length);
 }
 // #harta/MD-0066: centrăm harta pe parc și îi deschidem fișa
@@ -1119,6 +1065,13 @@ $('mRaion').addEventListener('input', () => {
   // Pe ecrane medii (filtrele stau deasupra hărții) coborâm la hartă ca să se vadă zoom-ul
   if (!mobil && innerWidth <= 900) $('map2').scrollIntoView({behavior: 'smooth', block: 'center'});
 });
+// „Resetează filtrele”: toate tipurile, toate raioanele, fără căutare, toată Moldova
+$('resetF').onclick = () => {
+  ['cbAct', 'cbNo', 'cbLive'].forEach(id => $(id).checked = true);
+  $('mRaion').value = ''; $('mQ').value = '';
+  renderMap2();
+  map2.flyToBounds(parks.map(p => [p.latitude, p.longitude]), {padding: [12, 12], duration: 0.8});
+};
 // Panoul „Filtre” și fișa parcului (doar pe telefon)
 function showPcard(p){
   $('pcard').innerHTML = `<button class="x" aria-label="${t('close')}">×</button>` + fisa(p);
@@ -1205,7 +1158,7 @@ function renderAllParks(){
   $('parksTitle').textContent = t('parksTitle')(parks.length);
   tabel($('allParks'), parkCols(true), filtreaza($('pQ').value, $('pAct').value, $('pRaion').value), st.all,
     {id: p => p.reference, open: openPark, detail: istoricParc, empty: t('noParks'), redo: renderAllParks,
-     sortKeys: ['reference', 'activations', 'qsos', 'last', ...(me ? ['dist'] : [])], card: p => parkCard(p, true),
+     sortKeys: ['reference', 'activations', 'qsos', 'last'], card: p => parkCard(p, true),
      click: id => { openPark = openPark === id ? null : id; histAll = false; renderAllParks(); }});
   syncChips();
   const hm = $('histMore'); if (hm) hm.onclick = () => { histAll = true; renderAllParks(); };
@@ -1315,7 +1268,7 @@ window.addEventListener('scroll', () => { $('totop').hidden = scrollY < 700; }, 
 $('totop').onclick = () => window.scrollTo({top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'});
 
 // ---------- Pornire ----------
-$('loc').value = store.get('potaMdLoc') || '';
+store.set('potaMdLoc', null);                       // ștergem locatorul salvat de versiunile vechi
 setLang(lang);
 loadData();
 if (!document.hidden) startSpots();

@@ -63,6 +63,7 @@ Ordinea etapelor: **stabilizare → pagina web pentru telefon → lansare public
 ## Idei pentru mai târziu 💡
 
 - 💡 Pagină separată **Hunteri** în meniu (top 5 hunteri pe parc, limita datelor de pe pota.app)
+- 💡 **Parcuri lângă mine (GPS)**: butonul „Lângă mine” arată parcurile cele mai apropiate, cu distanța; poziția rămâne doar în browser
 
 ## Etapa 4 – Durabilitate ⬜
 
