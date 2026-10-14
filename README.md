@@ -89,7 +89,6 @@ Then open http://localhost:8000
 - Data: [pota.app](https://pota.app) (Parks on the Air®)
 - Map: © [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors, [Leaflet](https://leafletjs.com)
 - Fonts: Bitter and Source Sans 3 (Google Fonts)
-- Thanks to **ER1SKI** for testing and feedback
 
 ---
 
