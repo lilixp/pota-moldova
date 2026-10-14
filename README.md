@@ -22,7 +22,7 @@ Unofficial statistics for the **Parks on the Air (POTA)** parks in the Republic 
 
 - **Callsign stats** in two cards: **Moldova** (from this page's daily data) and **Global** (live from the public pota.app profile).
 - **Romanian / English**, chosen automatically from the browser, switchable with the RO | EN button, or forced with `?lang=en`.
-- **Direct links** you can share: `#harta/MD-0066` (map centred on a park), `#parcuri/MD-0066` (park history), `#clasament/ER1SKI` (an activator), `#clasament/raioane` (districts).
+- **Direct links** you can share: `#harta/MD-0066` (map centred on a park), `#parcuri/MD-0066` (park history), `#clasament/ER1PL` (an activator), `#clasament/raioane` (districts).
 - **Optional locator** (e.g. `KN47`): shows distances to parks. Stored only in the visitor's browser.
 - Map markers: **green dot** = activated, **white circle with brown dot** = not activated yet, **red dot with pulse** = on the air now.
 
