@@ -21,7 +21,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bitter:wght@700&family=Source+Sans+3:wght@400;600;700&display=swap">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<!-- integrity = amprenta oficială cdnjs: browserul refuză fișierul dacă a fost modificat pe server -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" integrity="sha512-h9FcoyWjHcOcmEVkxOfTLnmZFWIH0iZhZT1H2TbOq55xssQGEJHEaIm+PgoUaZbRvQTNTluNOEfb1ZRy6D3BOw==" crossorigin="anonymous" referrerpolicy="no-referrer">
 <style>
 /* ---------- Culori și fonturi: varianta „Topografic” (hartă turistică tipărită) ---------- */
 :root{
@@ -396,8 +397,8 @@ footer .upd{color:var(--ink);font-weight:700;margin-bottom:6px}
   <section>
     <h2 data-t="searchTitle"></h2>
     <div class="tools" style="margin-top:12px">
-      <input id="q" data-t-ph="search" style="flex:1;min-width:220px" autocomplete="off">
-      <select id="fAct" class="fAct"></select>
+      <input id="q" data-t-ph="search" data-t-aria="searchTitle" style="flex:1;min-width:220px" autocomplete="off">
+      <select id="fAct" class="fAct" data-t-aria="fActLbl"></select>
       <div class="fchips" data-for="fAct"></div>
     </div>
     <div id="parks"></div>
@@ -468,8 +469,8 @@ footer .upd{color:var(--ink);font-weight:700;margin-bottom:6px}
 <main class="wrap view" id="v-parcuri" hidden>
   <div class="ptitle"><h1 id="parksTitle"></h1><p class="sub" data-t="parksPageNote"></p></div>
   <div class="tools">
-    <input id="pQ" data-t-ph="search" style="flex:1;min-width:220px" autocomplete="off">
-    <select id="pAct" class="fAct"></select>
+    <input id="pQ" data-t-ph="search" data-t-aria="searchTitle" style="flex:1;min-width:220px" autocomplete="off">
+    <select id="pAct" class="fAct" data-t-aria="fActLbl"></select>
     <div class="fchips" data-for="pAct"></div>
   </div>
   <div id="allParks"></div>
@@ -480,7 +481,7 @@ footer .upd{color:var(--ink);font-weight:700;margin-bottom:6px}
 <!-- Butonul „Sus”: apare după ce derulezi mult -->
 <button class="totop" id="totop" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg><span data-t="toTop"></span></button>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" integrity="sha512-puJW3E/qXDqYp9IfhAI54BJEaWIfloJ7JWs7OeD5i6ruC9JZL1gERT1wjtwXFlh7CjE7ZJ+/vcRZRkIYIb6p4g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
 // ---------- Setări ----------
 const API = 'https://api.pota.app';    // doar pentru spoturi live și statistici pe indicativ
@@ -501,7 +502,7 @@ const T = {
     title: 'Parcurile POTA din Moldova',
     note: `Proiect independent, neoficial. Date de la ${POTA}, actualizate zilnic. Nu este un site oficial Parks on the Air.`,
     loading: 'Se încarcă…',
-    liveNone: 'Nimeni în aer acum în parcurile MD.',
+    liveNone: 'Niciun spot din parcurile MD acum.',
     lastAct: (c, ref, name, d) => `Ultima activare: <b>${c}</b> din ${ref} ${name}, ${d}`,
     liveOn: n => `În aer acum în parcurile MD: ${n} ${n === 1 ? 'activare' : de(n) + 'activări'}`,
     checked: h => `verificat la ${h}`,
@@ -521,7 +522,7 @@ const T = {
     topTitle: 'Top parcuri', topSub: 'Top 10 · după numărul de QSO-uri',
     topHead: ['Parc', '', 'QSO'], allTop: 'Toate parcurile după QSO',
     searchTitle: 'Caută un parc', search: 'Nume sau referință, de exemplu Codru',
-    fAll: 'Toate', fYes: 'Doar activate', fNo: 'Doar neactivate',
+    fAll: 'Toate', fYes: 'Doar activate', fNo: 'Doar neactivate', fActLbl: 'Ce parcuri arăt',
     // Telefon
     spotsNA: 'Spoturile live nu sunt disponibile acum.',
     updLine: d => `Date actualizate la ${d}.`,
@@ -586,7 +587,7 @@ const T = {
     title: 'POTA parks in Moldova',
     note: `Independent, unofficial project. Data from ${POTA}, updated daily. This is not an official Parks on the Air website.`,
     loading: 'Loading…',
-    liveNone: 'Nobody is on the air in MD parks right now.',
+    liveNone: 'No spots from MD parks right now.',
     lastAct: (c, ref, name, d) => `Last activation: <b>${c}</b> from ${ref} ${name}, ${d}`,
     liveOn: n => `On the air now in MD parks: ${n} ${n === 1 ? 'activation' : 'activations'}`,
     checked: h => `checked at ${h}`,
@@ -606,7 +607,7 @@ const T = {
     topTitle: 'Top parks', topSub: 'Top 10 · by number of QSOs',
     topHead: ['Park', '', 'QSOs'], allTop: 'All parks by QSOs',
     searchTitle: 'Find a park', search: 'Name or reference, for example Codru',
-    fAll: 'All', fYes: 'Activated only', fNo: 'Not activated only',
+    fAll: 'All', fYes: 'Activated only', fNo: 'Not activated only', fActLbl: 'Which parks to show',
     spotsNA: 'Live spots are not available right now.',
     updLine: d => `Data updated ${d}.`,
     toTop: 'Top', filters: 'Filters', resetF: 'Reset filters', close: 'Close', sortBy: 'Sort:',
@@ -815,6 +816,7 @@ function setLang(l, salveaza){
   document.documentElement.lang = l;
   $$('[data-t]').forEach(el => el.innerHTML = t(el.dataset.t));
   $$('[data-t-ph]').forEach(el => el.placeholder = t(el.dataset.tPh));
+  $$('[data-t-aria]').forEach(el => el.setAttribute('aria-label', t(el.dataset.tAria)));
   $$('.fAct').forEach(sel => { const v = sel.value || 'all';
     sel.innerHTML = `<option value="all">${t('fAll')}</option><option value="yes">${t('fYes')}</option><option value="no">${t('fNo')}</option>`;
     sel.value = v; });
