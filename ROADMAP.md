@@ -28,7 +28,7 @@ Ordinea etapelor: **stabilizare → pagina web pentru telefon → lansare public
 *Testare cu activatorii din Moldova*
 
 - ⬜ Verificarea rulării zilnice automate (03:23 UTC)
-- ⬜ Varianta pentru telefon (tabelele devin carduri, filtrele hărții deasupra, meniu compact)
+- ✅ Varianta pentru telefon: meniu jos cu iconuri, harta pe tot ecranul, carduri, filtre ca butoane rotunde, butonul „Sus”
 - ⬜ Verificarea datelor pentru toți activatorii din clasament, față de pota.app
 - ⬜ Indicativele cu sufix sau prefix (`/P`, `YO/…`): cum se adună la indicativul de bază
 - ⬜ Mențiune clară pe pagină: datele se actualizează o dată pe zi

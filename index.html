@@ -197,6 +197,117 @@ button.go{font:700 15px var(--body);background:var(--act);color:var(--surface);b
 .card .note{font-size:12.5px;color:var(--muted);margin-top:12px}
 @media (max-width:900px){.cards{grid-template-columns:1fr}}
 
+
+/* ---------- Elemente noi (telefon): ascunse sau discrete pe PC ---------- */
+nav .links{display:contents}                        /* pe PC linkurile stau în meniul de sus, ca înainte */
+nav a.lnk svg{display:none}
+#map,#map2{isolation:isolate}                       /* butoanele hărții nu mai trec peste meniul fix */
+.fchips{display:none;flex-wrap:wrap;gap:8px}
+.chip{font:700 14px var(--body);border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:99px;padding:7px 14px;cursor:pointer}
+.chip.on{background:var(--act);border-color:var(--act);color:#fff}
+.sortbar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:4px 0 12px;font-size:13px;color:var(--muted)}
+.sortbar .chip{font-size:13px;padding:4px 11px}
+/* Cardurile (telefon) */
+.pc{background:var(--surface);border:1px solid var(--line);padding:10px 12px;margin-bottom:8px;position:relative}
+.pc.click{cursor:pointer;padding-right:36px}
+.pc.open{border-left:4px solid var(--act)}
+.pc .t{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pc .t b{font-size:16px}
+.pc .rk{color:var(--muted);font-weight:700;min-width:16px}
+.pc .m{color:var(--muted);font-size:13.5px;margin-top:3px}
+.pc .chev{position:absolute;right:14px;top:15px;width:9px;height:9px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg)}
+.pc.open .chev{transform:rotate(-135deg);top:19px}
+.pc .det{margin-top:10px;padding-top:10px;border-top:1px solid var(--line);cursor:auto}
+.pc .bar.mini{margin-top:6px}
+.hrow{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid var(--line);padding:6px 0;font-size:13.5px}
+.sp{flex-basis:100%;font-size:14px;padding:3px 0}
+/* Harta mare pe telefon: buton „Filtre”, panou care urcă de jos, fișa parcului */
+.mapwrap{position:relative}
+.fab,.sheetok{display:none}
+.fab{position:absolute;top:12px;right:12px;z-index:500;align-items:center;gap:7px;font:700 14px var(--body);background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:99px;padding:9px 15px;box-shadow:0 2px 8px rgba(0,0,0,.15);cursor:pointer}
+.fab svg{width:17px;height:17px}
+.backdrop{position:fixed;inset:0;background:rgba(30,42,34,.35);z-index:1002}
+.pcard{position:fixed;left:0;right:0;bottom:calc(62px + env(safe-area-inset-bottom));z-index:1003;background:var(--surface);border-radius:14px 14px 0 0;padding:16px 16px 18px;box-shadow:0 -6px 20px rgba(0,0,0,.14)}
+.pcard .x{position:absolute;top:6px;right:10px;background:none;border:0;font-size:28px;line-height:1;color:var(--muted);cursor:pointer;padding:4px}
+/* Butonul „Sus” */
+.totop{position:fixed;right:18px;bottom:22px;z-index:1000;display:flex;align-items:center;gap:6px;font:700 14px var(--body);background:var(--surface);color:var(--act);border:1px solid var(--act);border-radius:99px;padding:8px 15px 8px 11px;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.12)}
+.totop svg{width:18px;height:18px}
+
+/* ====================== TELEFON (ecran îngust) ====================== */
+@media (max-width:700px){
+  body{font-size:15px;padding-bottom:calc(64px + env(safe-area-inset-bottom))}
+  .wrap{padding-left:14px;padding-right:14px}
+  nav .wrap{height:48px;gap:8px}
+  nav .brand{font-size:17px}
+  .testtag{margin-left:0;font-size:11px}
+  /* Meniul coboară jos, cu iconuri */
+  nav .links{position:fixed;left:0;right:0;bottom:0;z-index:1001;display:grid;grid-template-columns:repeat(4,1fr);
+    background:var(--surface);border-top:1px solid var(--line);padding:5px 0 calc(6px + env(safe-area-inset-bottom))}
+  nav a.lnk{display:flex;flex-direction:column;align-items:center;gap:2px;padding:3px 0;border:0;font-size:11.5px}
+  nav a.lnk svg{display:block;width:24px;height:24px}
+  nav a.lnk.on{color:var(--act);border:0}
+  .band{display:block;margin-top:12px;font-size:14px;padding:8px 11px}
+  .band .dot{display:inline-block;margin-right:7px;vertical-align:1px}
+  .band .when{display:block;margin:4px 0 0;font-size:12px}
+  .title{padding:16px 0 14px}
+  .title .sub{font-size:13.5px}
+  h1{font-size:27px} h2{font-size:21px}
+  section{margin-top:32px}
+  .ptitle{padding:16px 0 10px}
+  /* Pagina Acum: harta mai scundă, cifrele în grilă 2×2 */
+  #map{height:300px}
+  .hero{gap:14px}
+  .kp{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+  .kp>div{background:var(--surface);padding:10px 12px}
+  .kp .n{font-size:30px}
+  .kp .lbl{font-size:13px}
+  .kp .bar{max-width:none}
+  .kp .wait{grid-column:1/-1;background:var(--hi-soft)}
+  .kp .pair{display:contents}
+  .kp .pair>div{background:var(--surface);padding:10px 12px}
+  .kp .pair .n{font-size:30px}
+  .under{gap:8px 14px}
+  .loc{margin-left:0}
+  table{font-size:14px}
+  th,td{padding:7px 6px}
+  /* Filtre ca butoane rotunde */
+  select.fAct{display:none}
+  .fchips{display:flex}
+  .tools input:not(.locIn){min-width:0 !important;flex:1 1 100% !important}   /* câmpul de căutare pe tot rândul */
+  .tools input,.tools select{border-radius:99px}
+  .tools select{flex:1}
+  .tabs{border:0;gap:8px;flex-wrap:wrap}
+  .tabs a{border:1px solid var(--line);border-radius:99px;padding:6px 15px;margin:0;background:var(--surface)}
+  .tabs a.on{background:var(--act);border-color:var(--act);color:#fff}
+  .morebar{gap:10px}
+  .btnmore{flex:1 1 100%;border-radius:99px;padding:10px}
+  .morebar a{margin-left:0}
+  .stats .n{font-size:22px}
+  .stats div{padding:8px 10px}
+  /* Pagina Hartă: harta pe tot ecranul */
+  body.v-harta .band,body.v-harta footer,body.v-harta .ptitle{display:none}
+  body.v-harta #v-harta{padding:0}
+  body.v-harta .totop{display:none}
+  .bigmap{display:block;padding:0}
+  #map2{height:calc(100dvh - 48px - 64px - env(safe-area-inset-bottom));min-height:0;border:0;border-radius:0}
+  .fab{display:inline-flex}
+  .side{position:fixed;left:0;right:0;bottom:calc(62px + env(safe-area-inset-bottom));z-index:1003;background:var(--surface);
+    border-radius:14px 14px 0 0;padding:10px 16px 16px;max-height:72vh;overflow:auto;transform:translateY(130%);
+    transition:transform .25s ease;box-shadow:0 -6px 20px rgba(0,0,0,.14);gap:14px}
+  .side.open{transform:none}
+  .side::before{content:'';display:block;width:38px;height:4px;border-radius:4px;background:var(--line);margin:0 auto}
+  .side .cbs{display:flex;flex-wrap:wrap;gap:8px}
+  .side label.cb{border:1px solid var(--line);border-radius:99px;padding:7px 13px;font-weight:700;font-size:14px;position:relative}
+  .side label.cb input{position:absolute;opacity:0;pointer-events:none}
+  .side label.cb:has(input:checked){background:var(--act);border-color:var(--act);color:#fff}
+  .side label.cb:has(input:checked) .mk{box-shadow:0 0 0 2px #fff}
+  .side select,.side input{border-radius:99px}
+  .sheetok{display:block;width:100%;border-radius:99px;padding:11px}
+  footer{margin-top:40px;padding-bottom:20px}
+  .totop{bottom:calc(78px + env(safe-area-inset-bottom));right:14px}
+}
+@media (prefers-reduced-motion:reduce){.side{transition:none}}
+
 footer{margin-top:56px;padding-top:18px;padding-bottom:40px;border-top:1px solid var(--line);color:var(--muted);font-size:13.5px}
 footer p{margin:0;max-width:85ch}
 
@@ -213,10 +324,13 @@ footer p{margin:0;max-width:85ch}
   <nav><div class="wrap">
     <a class="brand" href="#acum">ER POTA Tracker</a>
     <span class="testtag" data-t="testTag"></span>
-    <a class="lnk" href="#acum" data-v="acum" data-t="navNow"></a>
-    <a class="lnk" href="#harta" data-v="harta" data-t="navMap"></a>
-    <a class="lnk" href="#clasament" data-v="clasament" data-t="navLead"></a>
-    <a class="lnk" href="#parcuri" data-v="parcuri" data-t="navParks"></a>
+    <!-- Pe PC: linkuri sus; pe telefon: bară fixă jos, cu iconuri -->
+    <div class="links">
+      <a class="lnk" href="#acum" data-v="acum"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="1.6"/><path d="M8.5 8.5a5 5 0 0 0 0 7M15.5 8.5a5 5 0 0 1 0 7M5.6 5.6a9 9 0 0 0 0 12.8M18.4 5.6a9 9 0 0 1 0 12.8"/></svg><span data-t="navNow"></span></a>
+      <a class="lnk" href="#harta" data-v="harta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M3 6.5l6-2.5 6 2.5 6-2.5v13.5l-6 2.5-6-2.5-6 2.5z"/><path d="M9 4v13.5M15 6.5V20"/></svg><span data-t="navMap"></span></a>
+      <a class="lnk" href="#clasament" data-v="clasament"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4v1.5A3 3 0 0 0 7 10.5M17 6h3v1.5a3 3 0 0 1-3 3"/></svg><span data-t="navLead"></span></a>
+      <a class="lnk" href="#parcuri" data-v="parcuri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3L3.5 11h3L4 15.5h8L9.5 11h3z"/><path d="M8 15.5V21M16 21v-4"/><path d="M16.5 7L13 13h2.5l-2 4h6l-2-4H20z"/></svg><span data-t="navParks"></span></a>
+    </div>
     <div class="lang" role="group" aria-label="Limba / Language">
       <button data-lang="ro" lang="ro">RO</button><button data-lang="en" lang="en">EN</button>
     </div>
@@ -283,9 +397,10 @@ footer p{margin:0;max-width:85ch}
     <div class="tools" style="margin-top:12px">
       <input id="q" data-t-ph="search" style="flex:1;min-width:220px" autocomplete="off">
       <select id="fAct" class="fAct"></select>
+      <div class="fchips" data-for="fAct"></div>
       <select id="fRaion" class="fRaion"></select>
     </div>
-    <table id="parks"></table>
+    <div id="parks"></div>
     <!-- „Arată încă 10” adaugă următoarele 10 parcuri sub cele afișate -->
     <div class="morebar">
       <button class="btnmore" id="btnMore" data-t="moreBtn"></button>
@@ -308,12 +423,14 @@ footer p{margin:0;max-width:85ch}
 <main class="wrap view" id="v-harta" hidden>
   <div class="ptitle"><h1 data-t="mapPageTitle"></h1></div>
   <div class="bigmap">
-    <aside class="side">
+    <aside class="side" id="side">
       <div>
         <h3 data-t="mapShow"></h3>
-        <label class="cb"><input type="checkbox" id="cbAct" checked><span class="mk act"></span><span data-t="lgAct"></span></label>
-        <label class="cb"><input type="checkbox" id="cbNo" checked><span class="mk no"></span><span data-t="lgNo"></span></label>
-        <label class="cb"><input type="checkbox" id="cbLive" checked><span class="mk live"></span><span data-t="lgLive"></span></label>
+        <div class="cbs">
+          <label class="cb"><input type="checkbox" id="cbAct" checked><span class="mk act"></span><span data-t="lgAct"></span></label>
+          <label class="cb"><input type="checkbox" id="cbNo" checked><span class="mk no"></span><span data-t="lgNo"></span></label>
+          <label class="cb"><input type="checkbox" id="cbLive" checked><span class="mk live"></span><span data-t="lgLive"></span></label>
+        </div>
       </div>
       <div><h3><label for="mRaion" data-t="mapRaion"></label></h3><select id="mRaion" class="fRaion"></select></div>
       <div><h3><label for="mQ" data-t="mapSearch"></label></h3><input type="search" id="mQ" data-t-ph="search" autocomplete="off"></div>
@@ -323,9 +440,15 @@ footer p{margin:0;max-width:85ch}
         <div class="cnt locInfo" style="margin-top:4px"></div>
       </div>
       <div class="cnt" id="mCount"></div>
+      <button class="go sheetok" id="sheetOk"></button>
     </aside>
-    <div id="map2"></div>
+    <div class="mapwrap">
+      <div id="map2"></div>
+      <button class="fab" id="fab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg><span id="fabTxt"></span></button>
+    </div>
   </div>
+  <div class="backdrop" id="backdrop" hidden></div>
+  <div class="pcard" id="pcard" hidden></div>
 </main>
 
 <!-- ===================== PAGINA „CLASAMENT” ===================== -->
@@ -337,7 +460,7 @@ footer p{margin:0;max-width:85ch}
     <a href="#clasament/raioane" data-tab="raioane" data-t="tabRaion"></a>
   </div>
   <p class="sub" id="tabNote"></p>
-  <table id="bigTable"></table>
+  <div id="bigTable"></div>
 </main>
 
 <!-- ===================== PAGINA „PARCURI” ===================== -->
@@ -346,14 +469,18 @@ footer p{margin:0;max-width:85ch}
   <div class="tools">
     <input id="pQ" data-t-ph="search" style="flex:1;min-width:220px" autocomplete="off">
     <select id="pAct" class="fAct"></select>
+    <div class="fchips" data-for="pAct"></div>
     <select id="pRaion" class="fRaion"></select>
     <label for="pLoc" class="sub" style="margin:0" data-t="locLabel"></label>
     <input id="pLoc" class="locIn" placeholder="KN47" maxlength="6" autocomplete="off">
   </div>
-  <table id="allParks"></table>
+  <div id="allParks"></div>
 </main>
 
 <footer class="wrap"><p data-t="footer"></p></footer>
+
+<!-- Butonul „Sus”: apare după ce derulezi mult -->
+<button class="totop" id="totop" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg><span data-t="toTop"></span></button>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
@@ -400,6 +527,12 @@ const T = {
     raionTitle: 'Pe raioane', raionSub: 'Parcuri activate din total', raionAll: 'Toate raioanele',
     searchTitle: 'Caută un parc', search: 'Nume sau referință, de exemplu Codru',
     fAll: 'Toate', fYes: 'Doar activate', fNo: 'Doar neactivate', allRaion: 'Toate raioanele',
+    // Telefon
+    toTop: 'Sus', filters: 'Filtre', close: 'Închide', sortBy: 'Sortare:',
+    showN: n => `Arată ${n} ${n === 1 ? 'parc' : de(n) + 'parcuri'}`,
+    nActs: n => n === 1 ? '1 activare' : `${n} ${de(n)}activări`,
+    moreActs: n => `încă ${n} ${n === 1 ? 'activare' : de(n) + 'activări'}`,
+    chAll: 'Toate', chYes: 'Activate', chNo: 'Neactivate',
     moreBtn: 'Arată încă 10', moreCnt: (a, b) => `${a} din ${b}`,
     parksAll: n => `Toate cele ${n} ${de(n)}parcuri`, noParks: 'Niciun parc nu se potrivește căutării.',
     callTitle: 'Statisticile unui indicativ', callBtn: 'Arată',
@@ -474,6 +607,11 @@ const T = {
     raionTitle: 'By district', raionSub: 'Activated parks out of total', raionAll: 'All districts',
     searchTitle: 'Find a park', search: 'Name or reference, for example Codru',
     fAll: 'All', fYes: 'Activated only', fNo: 'Not activated only', allRaion: 'All districts',
+    toTop: 'Top', filters: 'Filters', close: 'Close', sortBy: 'Sort:',
+    showN: n => `Show ${n} ${n === 1 ? 'park' : 'parks'}`,
+    nActs: n => n === 1 ? '1 activation' : `${n} activations`,
+    moreActs: n => `${n} more`,
+    chAll: 'All', chYes: 'Activated', chNo: 'Not activated',
     moreBtn: 'Show 10 more', moreCnt: (a, b) => `${a} of ${b}`,
     parksAll: n => `All ${n} parks`, noParks: 'No park matches your search.',
     callTitle: 'Callsign stats', callBtn: 'Show',
@@ -549,6 +687,9 @@ const refTag = (ref, activated = true, href = '#parcuri/' + ref) =>
 const shortName = n => n.replace(/\s*\([^)]*\)/g, '')
   .replace(/\s+(National Park|Nature Reserve|Nature Park|Landscape Reserve|Forest Reserve|Park Reserve|Reserve|Park)$/i, '')
   .replace(/^(Parcul național|Rezervația științifică|Rezervația peisagistică|Rezervația silvică|Rezervația de plante medicinale|Pădurea-parc|Parcul)\s+/i, '');
+// Numele românesc întreg, fără partea în engleză de la final (pentru carduri pe telefon)
+const numeRo = n => n.replace(/\s*\([^)]*\)/g, '')
+  .replace(/(\s+(Landscape|Nature|National|Forest|State|Recreation|Protected|Other|Conservation|Area|Park|Reserve|Garden|Monument|Natural|Wildlife|Sanctuary|Scientific|Historic|Site|Heritage|World|Protective|Wetland))+$/i, '');
 const isoDate = d => d && d.length === 8 ? `${d.slice(0,4)}-${d.slice(4,6)}-${d.slice(6,8)}` : null;
 
 // Locator Maidenhead (4 sau 6 caractere) -> centrul pătratului, în grade
@@ -574,6 +715,11 @@ async function getJSON(url){
   return await r.json();
 }
 
+// ---------- Telefon sau PC? (ecran mai îngust de 700 px = telefon) ----------
+const mq = matchMedia('(max-width: 700px)');
+let mobil = mq.matches;
+mq.addEventListener('change', e => { mobil = e.matches; closeSheets(); renderLive(); renderView(); });
+
 // ---------- Tabel sortabil (folosit pe toate paginile) ----------
 // cols: [{k, label, num, desc, v(rând) = valoarea de sortare, cell(rând) = HTML-ul celulei, cls}]
 // st: {key, dir}; opt: {id(rând), open, detail(rând), click(id), limit, empty, redo()}
@@ -588,21 +734,39 @@ function tabel(el, cols, rows, st, opt = {}){
     return (typeof x === 'string' ? x.localeCompare(y, 'ro') : x - y) * st.dir;
   });
   const shown = opt.limit ? sorted.slice(0, opt.limit) : sorted;
-  el.innerHTML = '<tr>' + cols.map(c => `<th class="${c.num ? 'r' : ''}${c.label ? ' s' : ''}" data-k="${c.k}">${c.label || ''}${st.key === c.k && c.label ? (st.dir > 0 ? ' ▲' : ' ▼') : ''}</th>`).join('') + '</tr>' +
+  const sortBy = k => {
+    const c = cols.find(c => c.k === k);
+    st.dir = st.key === k ? -st.dir : (c.asc ? 1 : c.num || c.desc ? -1 : 1);   // numerele: întâi cele mari
+    st.key = k; opt.redo();
+  };
+  const clic = sel => { if (opt.click) el.querySelectorAll(sel).forEach(x => x.onclick = e => {
+    if (!e.target.closest('a, button, .det')) opt.click(x.dataset.id);   // clic în detalii nu închide cardul
+  }); };
+  // Pe telefon: carduri în loc de tabel; sortarea din butoane rotunde
+  if (mobil && opt.card){
+    const keys = opt.sortKeys || [];
+    const bar = keys.length ? `<div class="sortbar"><span>${t('sortBy')}</span>` + keys.map(k => {
+      const c = cols.find(c => c.k === k);
+      return `<button class="chip${st.key === k ? ' on' : ''}" data-k="${k}">${c.label}${st.key === k ? (st.dir > 0 ? ' ▲' : ' ▼') : ''}</button>`;
+    }).join('') + '</div>' : '';
+    el.innerHTML = bar + (shown.map(r => {
+      const id = opt.id ? opt.id(r) : '', open = opt.open && id === opt.open;
+      return `<div class="pc${opt.click ? ' click' : ''}${open ? ' open' : ''}" data-id="${esc(id)}">${opt.card(r)}` +
+        (opt.click ? '<span class="chev"></span>' : '') + (open ? `<div class="det">${opt.detail(r)}</div>` : '') + '</div>';
+    }).join('') || `<div class="empty">${opt.empty || ''}</div>`);
+    el.querySelectorAll('.sortbar .chip').forEach(b => b.onclick = () => sortBy(b.dataset.k));
+    clic('.pc[data-id]');
+    return sorted;
+  }
+  el.innerHTML = '<table><tr>' + cols.map(c => `<th class="${c.num ? 'r' : ''}${c.label ? ' s' : ''}" data-k="${c.k}">${c.label || ''}${st.key === c.k && c.label ? (st.dir > 0 ? ' ▲' : ' ▼') : ''}</th>`).join('') + '</tr>' +
     (shown.map(r => {
       const id = opt.id ? opt.id(r) : '', open = opt.open && id === opt.open;
       return `<tr data-id="${esc(id)}" class="${opt.click ? 'click' : ''}${open ? ' open' : ''}">` +
         cols.map(c => `<td class="${c.num ? 'r' : ''} ${c.cls || ''}">${c.cell ? c.cell(r) : esc(val(r, c) ?? '—')}</td>`).join('') + '</tr>' +
         (open ? `<tr class="det"><td colspan="${cols.length}">${opt.detail(r)}</td></tr>` : '');
-    }).join('') || `<tr><td colspan="${cols.length}" class="empty">${opt.empty || ''}</td></tr>`);
-  el.querySelectorAll('th.s').forEach(th => th.onclick = () => {
-    const k = th.dataset.k, c = cols.find(c => c.k === k);
-    st.dir = st.key === k ? -st.dir : (c.asc ? 1 : c.num || c.desc ? -1 : 1);   // numerele: întâi cele mari
-    st.key = k; opt.redo();
-  });
-  if (opt.click) el.querySelectorAll('tr[data-id]').forEach(tr => tr.onclick = e => {
-    if (!e.target.closest('a, button')) opt.click(tr.dataset.id);
-  });
+    }).join('') || `<tr><td colspan="${cols.length}" class="empty">${opt.empty || ''}</td></tr>`) + '</table>';
+  el.querySelectorAll('th.s').forEach(th => th.onclick = () => sortBy(th.dataset.k));
+  clic('tr[data-id]');
   return sorted;
 }
 
@@ -651,9 +815,20 @@ function setLang(l, salveaza){
     sel.innerHTML = `<option value="all">${t('fAll')}</option><option value="yes">${t('fYes')}</option><option value="no">${t('fNo')}</option>`;
     sel.value = v; });
   $$('.lang button').forEach(b => { b.classList.toggle('on', b.dataset.lang === l); b.setAttribute('aria-pressed', b.dataset.lang === l); });
+  $$('.fchips').forEach(box => box.innerHTML = [['all', 'chAll'], ['yes', 'chYes'], ['no', 'chNo']]
+    .map(([v, k]) => `<button class="chip" data-v="${v}">${t(k)}</button>`).join(''));
+  syncChips();
   fillRaionSelects(); renderLive(); updateLocInfo(); renderView(); renderCall();
 }
 $$('.lang button').forEach(b => b.onclick = () => setLang(b.dataset.lang, true));
+// Butoanele rotunde schimbă lista ascunsă de alături (aceeași logică de filtrare ca pe PC)
+function syncChips(){
+  $$('.fchips').forEach(box => box.querySelectorAll('.chip').forEach(b => b.classList.toggle('on', b.dataset.v === $(box.dataset.for).value)));
+}
+$$('.fchips').forEach(box => box.onclick = e => {
+  const b = e.target.closest('.chip'); if (!b) return;
+  const sel = $(box.dataset.for); sel.value = b.dataset.v; sel.dispatchEvent(new Event('input')); syncChips();
+});
 
 // ---------- Navigarea între pagini (#acum, #harta, #clasament, #parcuri) ----------
 function route(){
@@ -661,6 +836,8 @@ function route(){
   const prev = view;
   view = ['harta', 'clasament', 'parcuri'].includes(v) ? v : 'acum';
   $$('.view').forEach(el => el.hidden = el.id !== 'v-' + view);
+  document.body.className = 'v-' + view;            // pe telefon, pagina Hartă ascunde banda și subsolul
+  closeSheets();
   $('homeTitle').hidden = view !== 'acum';
   $$('nav a.lnk').forEach(a => a.classList.toggle('on', a.dataset.v === view));
   if (view === 'clasament'){
@@ -668,12 +845,12 @@ function route(){
     if (arg && tab === 'activatori') openCall = arg.toUpperCase();
   }
   if (view === 'parcuri' && arg){                  // #parcuri/MD-0066 = deschide istoricul acelui parc
-    openPark = arg.toUpperCase(); $('pQ').value = ''; $('pAct').value = 'all'; $('pRaion').value = '';
+    openPark = arg.toUpperCase(); histAll = false; $('pQ').value = ''; $('pAct').value = 'all'; $('pRaion').value = '';
   }
   renderView();
   if (view === 'harta') focusPark(arg ? arg.toUpperCase() : null);
   // Sus la schimbarea paginii; la istoricul unui parc, derulăm până la el
-  const row = view === 'parcuri' && arg && document.querySelector(`#allParks tr[data-id="${CSS.escape(openPark)}"]`);
+  const row = view === 'parcuri' && arg && document.querySelector(`#allParks [data-id="${CSS.escape(openPark)}"]`);
   if (row) row.scrollIntoView({block: 'center'});
   else if (prev !== view || view !== 'clasament') window.scrollTo(0, 0);
 }
@@ -693,6 +870,13 @@ function renderLive(){
   const when = spotsAt ? `<span class="when">${t('checked')(spotsAt.toLocaleTimeString(t('locale'), {hour:'2-digit', minute:'2-digit'}))}</span>` : '';
   box.classList.toggle('on', list.length > 0);
   if (list.length){
+    const ago = s => t('ago')(Math.round((Date.now() - new Date(s.spotTime + 'Z')) / 60000));
+    if (mobil){
+      box.innerHTML = `<span class="dot"></span><b>${t('liveOn')(list.length)}</b>${when}` +
+        list.map(s => `<div class="sp"><b>${esc(s.activator)}</b> ${esc(s.frequency)} kHz ${esc(s.mode)} ·
+          ${refTag(s.reference, true, '#harta/' + s.reference)} ${esc(s.name)} · ${ago(s)}</div>`).join('');
+      return;
+    }
     const H = t('spotHead');
     box.innerHTML = `<span class="dot"></span><b>${t('liveOn')(list.length)}</b>${when}
       <table><tr><th>${H[0]}</th><th class="r">${H[1]}</th><th>${H[2]}</th><th>${H[3]}</th><th class="r">${H[4]}</th></tr>` +
@@ -758,7 +942,7 @@ function fisa(p){                                   // fișa scurtă care se des
     <div class="acts"><a href="#parcuri/${esc(p.reference)}">${t('history')}</a>
       <a href="https://pota.app/#/park/${esc(p.reference)}" target="_blank" rel="noopener">${t('onPota')}</a></div></div>`;
 }
-function drawParks(lyr, list, store){
+function drawParks(lyr, list, store, jos){
   const css = getComputedStyle(document.documentElement), col = v => css.getPropertyValue(v).trim();
   const live = liveSet();
   // Ordinea contează: neactivatele jos, activatele deasupra, cele „în aer” deasupra tuturor
@@ -774,7 +958,8 @@ function drawParks(lyr, list, store){
       L.marker(ll, {icon: L.divIcon({className: '', html: '<span class="puls"></span>', iconSize: [20, 20]}), interactive: false}).addTo(lyr);
       m = L.circleMarker(ll, {radius: 8, color: '#fff', weight: 2.5, fillColor: col('--live'), fillOpacity: 1});
     }
-    m.addTo(lyr).bindPopup(() => fisa(p));
+    if (jos) m.addTo(lyr).on('click', () => showPcard(p));   // telefon: fișa urcă de jos
+    else m.addTo(lyr).bindPopup(() => fisa(p));
     // Punctul maro din centrul cercului neactivat (desenat după cerc, ca să fie deasupra)
     if (g === 0) L.circleMarker(ll, {radius: 2, stroke: false, fillColor: col('--none'), fillOpacity: 1, interactive: false}).addTo(lyr);
     if (store) store[p.reference] = m;
@@ -872,13 +1057,21 @@ function parkCols(extra){
     ...(extra ? [{k: 'last', label: t('cLast'), desc: 1, cls: 'dt', cell: p => p.last ? fmtDate(p.last) : '—'}] : []),
   ];
 }
+// Cardul unui parc (telefon)
+function parkCard(p, extra){
+  const done = p.activations > 0, live = liveSet().has(p.reference);
+  return `<div class="t">${refTag(p.reference, done)}<b>${esc(numeRo(p.name))}</b>${live ? '<span class="tag live">LIVE</span>' : ''}</div>
+    <div class="m">${esc(p.raion)}${me ? ` · ${p.dist.toFixed(0)} km` : ''} · ${done ? `${t('nActs')(p.activations)} · ${fmt(p.qsos)} QSO` : t('fNever')}</div>` +
+    (extra && p.last ? `<div class="m">${t('cLast').toLowerCase()} ${fmtDate(p.last)}</div>` : '');
+}
 let homeShown = TOP;                                // câte parcuri arată lista de pe pagina Acum
 function renderParks(){
   const q = $('q').value, fa = $('fAct').value, fr = $('fRaion').value;
   const filtered = q.trim() || fa !== 'all' || fr;
   const rows = filtreaza(q, fa, fr);
   tabel($('parks'), parkCols(), rows, st.home,
-    {limit: filtered ? 0 : homeShown, empty: t('noParks'), redo: renderParks});
+    {limit: filtered ? 0 : homeShown, empty: t('noParks'), redo: renderParks, card: p => parkCard(p)});
+  syncChips();
   // Butonul „Arată încă 10” apare doar fără căutare și cât timp mai sunt parcuri neafișate
   const shown = filtered ? rows.length : Math.min(homeShown, rows.length);
   $('btnMore').hidden = filtered || shown >= rows.length;
@@ -902,9 +1095,11 @@ function renderMap2(){
   if (layer2) layer2.remove();
   layer2 = L.layerGroup().addTo(map2);
   markers2 = {};
-  drawParks(layer2, list, markers2);
+  drawParks(layer2, list, markers2, mobil);
   meMarker2 = meDot(map2, meMarker2);
   $('mCount').textContent = t('mapCount')(list.length);
+  $('fabTxt').textContent = `${t('filters')} · ${t('mapCount')(list.length).replace(/ pe hartă| on the map/, '')}`;
+  $('sheetOk').textContent = t('showN')(list.length);
 }
 // #harta/MD-0066: centrăm harta pe parc și îi deschidem fișa
 function focusPark(ref){
@@ -912,10 +1107,22 @@ function focusPark(ref){
   setTimeout(() => {                                // după ce harta își ia dimensiunea reală
     map2.invalidateSize();
     const m = ref && markers2[ref];
-    if (m){ map2.setView(m.getLatLng(), 11); m.openPopup(); }
+    if (m){ map2.setView(m.getLatLng(), 11); mobil ? showPcard(parks.find(p => p.reference === ref)) : m.openPopup(); }
   }, 50);
 }
 ['cbAct', 'cbNo', 'cbLive', 'mRaion', 'mQ'].forEach(id => $(id).addEventListener('input', renderMap2));
+// Panoul „Filtre” și fișa parcului (doar pe telefon)
+function showPcard(p){
+  $('pcard').innerHTML = `<button class="x" aria-label="${t('close')}">×</button>` + fisa(p);
+  $('pcard').hidden = false;
+  $('pcard').querySelector('.x').onclick = () => $('pcard').hidden = true;
+}
+function closeSheets(){
+  $('side').classList.remove('open'); $('backdrop').hidden = true; $('pcard').hidden = true;
+}
+$('fab').onclick = () => { $('pcard').hidden = true; $('side').classList.add('open'); $('backdrop').hidden = false; };
+$('sheetOk').onclick = closeSheets;
+$('backdrop').onclick = closeSheets;
 
 // ---------- Pagina Clasament ----------
 function renderClasament(){
@@ -935,6 +1142,10 @@ function renderClasament(){
       {k: 'prima', label: t('cFirst'), desc: 1, cls: 'dt', cell: r => fmtDate(r.prima)},
       {k: 'ultima', label: t('cLast'), desc: 1, cls: 'dt', cell: r => fmtDate(r.ultima)},
     ], rows, st.ops, {id: r => r.indicativ, open: openCall, detail: detaliuActivator, redo: renderClasament,
+      sortKeys: ['activari', 'qso', 'parcuri', 'ultima'],
+      card: r => `<div class="t"><span class="rk">${r.rank}</span><b>${esc(r.indicativ)}</b></div>
+        <div class="m">${t('nActs')(r.activari)} · ${r.parcuri} ${t('cParks').toLowerCase()} · ${fmt(r.qso)} QSO</div>
+        <div class="m">${r.tentative} ${t('cTent').toLowerCase()} · ${t('cFirst').toLowerCase()} ${fmtDate(r.prima)} · ${t('cLast').toLowerCase()} ${fmtDate(r.ultima)}</div>`,
       click: id => { openCall = openCall === id ? null : id; renderClasament(); }});
     const b = el.querySelector('.det button.go');
     if (b) b.onclick = () => { b.disabled = true; loadProfile(openCall, renderClasament); };
@@ -950,6 +1161,10 @@ function renderClasament(){
       {k: 'ops', label: t('cOps'), num: 1},
       {k: 'last', label: t('cLast'), desc: 1, cls: 'dt', cell: p => fmtDate(p.last)},
     ], rows, st.tparks, {id: p => p.reference, redo: renderClasament,
+      sortKeys: ['qsos', 'activations', 'ops', 'last'],
+      card: p => `<div class="t">${refTag(p.reference, p.activations > 0)}<b>${esc(numeRo(p.name))}</b></div>
+        <div class="m">${esc(p.raion)} · ${t('nActs')(p.activations)} · ${fmt(p.qsos)} QSO</div>
+        <div class="m">${p.ops} ${t('cOps').toLowerCase()} · ${t('cLast').toLowerCase()} ${fmtDate(p.last)}</div>`,
       click: id => { location.hash = '#parcuri/' + id; }});
   }
   if (tab === 'raioane'){
@@ -961,7 +1176,10 @@ function renderClasament(){
       {k: 'bar', cell: r => `<div class="bar mini"><i style="width:${r.pct}%"></i></div>`},
       {k: 'acts', label: t('cActs'), num: 1},
       {k: 'q', label: t('cQso'), num: 1, cell: r => fmt(r.q)},
-    ], raionStats(), st.rai, {redo: renderClasament});
+    ], raionStats(), st.rai, {redo: renderClasament, sortKeys: ['n', 'pct', 'q'],
+      card: r => `<div class="t"><b>${esc(r.raion)}</b><span class="m" style="margin:0 0 0 auto">${r.a}/${r.n} · ${r.pct}%</span></div>
+        <div class="bar mini"><i style="width:${r.pct}%"></i></div>
+        <div class="m">${t('nActs')(r.acts)} · ${fmt(r.q)} QSO</div>`});
   }
 }
 function detaliuActivator(r){
@@ -979,10 +1197,23 @@ function renderAllParks(){
   $('parksTitle').textContent = t('parksTitle')(parks.length);
   tabel($('allParks'), parkCols(true), filtreaza($('pQ').value, $('pAct').value, $('pRaion').value), st.all,
     {id: p => p.reference, open: openPark, detail: istoricParc, empty: t('noParks'), redo: renderAllParks,
-     click: id => { openPark = openPark === id ? null : id; renderAllParks(); }});
+     sortKeys: ['reference', 'activations', 'qsos', 'last', ...(me ? ['dist'] : [])], card: p => parkCard(p, true),
+     click: id => { openPark = openPark === id ? null : id; histAll = false; renderAllParks(); }});
+  syncChips();
+  const hm = $('histMore'); if (hm) hm.onclick = () => { histAll = true; renderAllParks(); };
 }
+let histAll = false;                                // telefon: arată tot istoricul parcului deschis
 function istoricParc(p){
   const h = byPark[p.reference]?.list || [];
+  if (mobil && h.length){
+    const lim = histAll ? h.length : 3;
+    const moduri = a => [a.cw && 'CW', a.ph && t('hPh').toLowerCase(), a.data && 'DATA'].filter(Boolean).join(', ');
+    return `<h3>${t('history')}</h3>` + h.slice(0, lim).map(a => `<div class="hrow"><span>${fmtDate(a.d)} <b>${esc(a.call)}</b></span>
+        <span>${fmt(a.q)} QSO${a.q < QSO_MINIM ? `<span class="small">${t('under10')}</span>` : ''} · ${moduri(a)}</span></div>`).join('') +
+      (h.length > lim ? `<button class="linkbtn" id="histMore" style="margin-top:8px">${t('moreActs')(h.length - lim)}</button>` : '') +
+      `<div class="links"><a href="#harta/${esc(p.reference)}">${t('showOnMap')}</a>
+        <a href="https://pota.app/#/park/${esc(p.reference)}" target="_blank" rel="noopener">${t('onPota')}</a></div>`;
+  }
   const links = `<div class="links"><a href="#harta/${esc(p.reference)}">${t('showOnMap')}</a>
     <a href="https://pota.app/#/park/${esc(p.reference)}" target="_blank" rel="noopener">${t('onPota')}</a></div>`;
   if (!h.length) return `<h3>${t('history')}</h3><div class="empty" style="padding:0">${t('histNone')}</div>${links}`;
@@ -1070,6 +1301,10 @@ function showCall(){
 }
 $('btnCall').onclick = showCall;
 $('call').onkeydown = e => { if (e.key === 'Enter') showCall(); };
+
+// ---------- Butonul „Sus” ----------
+window.addEventListener('scroll', () => { $('totop').hidden = scrollY < 700; }, {passive: true});
+$('totop').onclick = () => window.scrollTo({top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'});
 
 // ---------- Pornire ----------
 $('loc').value = store.get('potaMdLoc') || '';
