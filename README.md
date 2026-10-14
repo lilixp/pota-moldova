@@ -82,7 +82,7 @@ Then open http://localhost:8000
 
 ## Status and roadmap
 
-**Test version.** A roadmap will follow.
+**Test version.** See the [roadmap](ROADMAP.md) (in Romanian) for what comes next.
 
 ## Credits
 
