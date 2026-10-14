@@ -29,7 +29,7 @@ URL_PARCURI = URL_BAZA + "/program/parks/MD"
 FOLDER_DATE = Path(__file__).resolve().parent.parent / "data"
 
 # Ne prezentăm clar serverului: proiect, indicativ, adresa codului sursă
-USER_AGENT = ("POTA-Moldova-stats/1.0 (unofficial daily statistics for Moldova parks; "
+USER_AGENT = ("ER-POTA-Tracker/1.0 (unofficial daily statistics for Moldova parks; "
               "ER1PL; +https://github.com/lilixp/pota-moldova)")
 
 PAUZA = 1.0          # secunde între două cereri

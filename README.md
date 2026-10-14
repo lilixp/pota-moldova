@@ -1,4 +1,4 @@
-# POTA Moldova
+# ER POTA Tracker
 
 Unofficial statistics page for the Parks on the Air (POTA) parks in the Republic of Moldova.
 Pagină neoficială cu statistici pentru parcurile POTA din Republica Moldova.

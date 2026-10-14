@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>POTA Moldova</title>
+<title>ER POTA Tracker</title>
 <!-- TEST: cere motoarelor de căutare să nu afișeze pagina (se scoate la lansarea oficială) -->
 <meta name="robots" content="noindex, nofollow">
 <meta name="description" content="Statistici neoficiale pentru parcurile Parks on the Air din Republica Moldova · Unofficial statistics for Parks on the Air in the Republic of Moldova">
@@ -40,6 +40,11 @@ h2{font-size:24px}
 section{margin-top:44px}
 .linkbtn{background:none;border:0;padding:0;font:inherit;font-size:14px;font-weight:700;color:var(--act);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
 a.more{display:inline-block;margin-top:10px;font-size:14px;font-weight:700}
+.morebar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin-top:12px;font-size:14px}
+.morebar #moreCnt{color:var(--muted)}
+.morebar a{margin-left:auto;font-weight:700}
+.btnmore{font:700 15px var(--body);color:var(--act);background:var(--surface);border:1px solid var(--act);border-radius:var(--radius);padding:7px 16px;cursor:pointer}
+.btnmore:hover{background:var(--act);color:var(--surface)}
 
 /* ---------- Partea de sus: meniu, bandă live, titlu ---------- */
 nav{position:sticky;top:0;z-index:1000;background:var(--surface);border-bottom:1px solid var(--line)}
@@ -206,7 +211,7 @@ footer p{margin:0;max-width:85ch}
 <body>
 <div class="top">
   <nav><div class="wrap">
-    <a class="brand" href="#acum">POTA Moldova</a>
+    <a class="brand" href="#acum">ER POTA Tracker</a>
     <span class="testtag" data-t="testTag"></span>
     <a class="lnk" href="#acum" data-v="acum" data-t="navNow"></a>
     <a class="lnk" href="#harta" data-v="harta" data-t="navMap"></a>
@@ -281,7 +286,12 @@ footer p{margin:0;max-width:85ch}
       <select id="fRaion" class="fRaion"></select>
     </div>
     <table id="parks"></table>
-    <a class="more" href="#parcuri" id="parksAllLink"></a>
+    <!-- „Arată încă 10” adaugă următoarele 10 parcuri sub cele afișate -->
+    <div class="morebar">
+      <button class="btnmore" id="btnMore" data-t="moreBtn"></button>
+      <span id="moreCnt"></span>
+      <a href="#parcuri" id="parksAllLink"></a>
+    </div>
   </section>
 
   <section id="indicativ">
@@ -390,6 +400,7 @@ const T = {
     raionTitle: 'Pe raioane', raionSub: 'Parcuri activate din total', raionAll: 'Toate raioanele',
     searchTitle: 'Caută un parc', search: 'Nume sau referință, de exemplu Codru',
     fAll: 'Toate', fYes: 'Doar activate', fNo: 'Doar neactivate', allRaion: 'Toate raioanele',
+    moreBtn: 'Arată încă 10', moreCnt: (a, b) => `${a} din ${b}`,
     parksAll: n => `Toate cele ${n} ${de(n)}parcuri`, noParks: 'Niciun parc nu se potrivește căutării.',
     callTitle: 'Statisticile unui indicativ', callBtn: 'Arată',
     callNone: 'Indicativul nu există în POTA.',
@@ -427,7 +438,7 @@ const T = {
     histNone: 'Parcul nu a fost activat încă.',
     errNet: 'Datele nu s-au putut încărca. Verifică internetul și reîncarcă pagina.',
     errMap: 'Harta nu s-a putut încărca. Verifică internetul.',
-    footer: `Proiect independent realizat de ER1PL, neafiliat cu Parks on the Air®.
+    footer: `<b>ER POTA Tracker</b> · proiect independent realizat de ER1PL, neafiliat cu Parks on the Air®.
       Date: ${POTA}, prin API-ul intern al site-ului, care se poate schimba sau opri oricând.
       Spoturile se citesc live; parcurile și clasamentele se actualizează o dată pe zi.
       Hartă © <a href="${OSM}" target="_blank" rel="noopener">contribuitorii OpenStreetMap</a>.
@@ -463,6 +474,7 @@ const T = {
     raionTitle: 'By district', raionSub: 'Activated parks out of total', raionAll: 'All districts',
     searchTitle: 'Find a park', search: 'Name or reference, for example Codru',
     fAll: 'All', fYes: 'Activated only', fNo: 'Not activated only', allRaion: 'All districts',
+    moreBtn: 'Show 10 more', moreCnt: (a, b) => `${a} of ${b}`,
     parksAll: n => `All ${n} parks`, noParks: 'No park matches your search.',
     callTitle: 'Callsign stats', callBtn: 'Show',
     callNone: 'This callsign is not in POTA.',
@@ -496,7 +508,7 @@ const T = {
     histNone: 'This park has not been activated yet.',
     errNet: 'Could not load the data. Check your connection and reload the page.',
     errMap: 'The map could not load. Check your connection.',
-    footer: `Independent project by ER1PL, not affiliated with Parks on the Air®.
+    footer: `<b>ER POTA Tracker</b> · independent project by ER1PL, not affiliated with Parks on the Air®.
       Data: ${POTA}, via the site's internal API, which may change or stop at any time.
       Spots are read live; parks and leaderboards are updated once a day.
       Map © <a href="${OSM}" target="_blank" rel="noopener">OpenStreetMap contributors</a>.
@@ -860,13 +872,20 @@ function parkCols(extra){
     ...(extra ? [{k: 'last', label: t('cLast'), desc: 1, cls: 'dt', cell: p => p.last ? fmtDate(p.last) : '—'}] : []),
   ];
 }
+let homeShown = TOP;                                // câte parcuri arată lista de pe pagina Acum
 function renderParks(){
   const q = $('q').value, fa = $('fAct').value, fr = $('fRaion').value;
   const filtered = q.trim() || fa !== 'all' || fr;
-  tabel($('parks'), parkCols(), filtreaza(q, fa, fr), st.home,
-    {limit: filtered ? 0 : TOP, empty: t('noParks'), redo: renderParks});
+  const rows = filtreaza(q, fa, fr);
+  tabel($('parks'), parkCols(), rows, st.home,
+    {limit: filtered ? 0 : homeShown, empty: t('noParks'), redo: renderParks});
+  // Butonul „Arată încă 10” apare doar fără căutare și cât timp mai sunt parcuri neafișate
+  const shown = filtered ? rows.length : Math.min(homeShown, rows.length);
+  $('btnMore').hidden = filtered || shown >= rows.length;
+  $('moreCnt').textContent = filtered ? '' : t('moreCnt')(shown, rows.length);
   $('parksAllLink').textContent = t('parksAll')(parks.length);
 }
+$('btnMore').onclick = () => { homeShown += TOP; renderParks(); };
 ['q', 'fAct', 'fRaion'].forEach(id => $(id).addEventListener('input', renderParks));
 
 // ---------- Pagina Hartă ----------
