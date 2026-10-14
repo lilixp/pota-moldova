@@ -103,9 +103,10 @@ def calculeaza_clasament(activari):
             if qso >= QSO_MINIM:
                 r["activari"] += 1
                 r["parcuri"].add(ref)
+                # Ultima activare = doar cele valide (tentativele nu se socotesc)
+                r["ultima"] = max(r["ultima"], a.get("qso_date") or "")
             else:
                 r["tentative"] += 1
-            r["ultima"] = max(r["ultima"], a.get("qso_date") or "")
 
     clasament = []
     for r in pe_indicativ.values():

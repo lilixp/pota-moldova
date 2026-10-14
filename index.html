@@ -182,6 +182,9 @@ input,select{font:inherit;font-size:15px;color:var(--ink);background:var(--surfa
 input::placeholder{color:var(--muted)}
 button.go{font:700 15px var(--body);background:var(--act);color:var(--surface);border:1px solid var(--act);border-radius:var(--radius);padding:8px 16px;cursor:pointer}
 .tag{font-size:12px;font-weight:700;padding:0 6px;border-radius:99px;margin-left:6px}
+.tag.first{background:var(--none);color:#fff}           /* plăcuța „prima” din istoricul parcului */
+.firstln{background:var(--none-fill);border-radius:8px;padding:6px 10px;margin:6px 0}
+tr.first td{background:#fbf3e4}
 .tag.live{background:var(--live);color:#fff}
 .err{color:var(--noact);font-size:14px;margin:6px 0}
 .err:empty{display:none}
@@ -568,6 +571,8 @@ const T = {
     lgTent: 'doar tentative (sub 10 QSO)', tentCnt: n => ` · ${n} doar ${n === 1 ? 'tentativă' : 'tentative'}`,
     mapCount: n => `${n} ${n === 1 ? 'parc' : de(n) + 'parcuri'} pe hartă`,
     fActs: 'Activări', fQso: 'QSO', fLast: 'Ultima activare', fNever: 'încă nu a fost activat',
+    fFirst: 'Prima activare', firstTag: 'prima', cOpened: 'Primul în',
+    openedRow: (n, ref, d) => `Primul în <b>${n}</b> ${n === 1 ? 'parc' : de(n) + 'parcuri'} MD · cel mai recent: ${ref}, ${d}`,
     history: 'Istoricul activărilor', onPota: 'Pagina parcului pe pota.app', showOnMap: 'Vezi pe hartă',
     // Pagina Clasament
     leadPageTitle: 'Clasamente', tabOps: 'Activatori', tabParks: 'Parcuri', tabRaion: 'Raioane',
@@ -652,6 +657,8 @@ const T = {
     lgTent: 'attempts only (under 10 QSOs)', tentCnt: n => ` · ${n} attempts only`,
     mapCount: n => `${n} ${n === 1 ? 'park' : 'parks'} on the map`,
     fActs: 'Activations', fQso: 'QSOs', fLast: 'Last activation', fNever: 'not activated yet',
+    fFirst: 'First activation', firstTag: 'first', cOpened: 'First in',
+    openedRow: (n, ref, d) => `First to activate <b>${n}</b> MD ${n === 1 ? 'park' : 'parks'} · most recent: ${ref}, ${d}`,
     history: 'Activation history', onPota: 'Park page on pota.app', showOnMap: 'Show on map',
     leadPageTitle: 'Leaderboards', tabOps: 'Activators', tabParks: 'Parks', tabRaion: 'Districts',
     noteOps: 'All activators in MD parks. Valid activation: at least 10 QSOs; attempt: under 10. Click a row to see their parks.',
@@ -802,15 +809,33 @@ function calculeaza(){
       if (d && (!bp.last || d > bp.last)) bp.last = d;
       if (call) bp.calls.add(call);
       const bc = byCall[call] ||= {first: null, parks: {}, cw: 0, ph: 0, data: 0};
-      if (d && (!bc.first || d < bc.first)) bc.first = d;
+      // Prima și ultima activare a indicativului: doar cele valide (cel puțin 10 QSO)
+      if (d && q >= QSO_MINIM && (!bc.first || d < bc.first)) bc.first = d;
+      if (d && q >= QSO_MINIM && (!bc.last || d > bc.last)) bc.last = d;
       bc.cw += a.qsosCW || 0; bc.ph += a.qsosPHONE || 0; bc.data += a.qsosDATA || 0;
       const pp = bc.parks[ref] ||= {n: 0, q: 0};
       if (q >= QSO_MINIM) pp.n++;
       pp.q += q;
     }
     bp.list.sort((a, b) => (b.d || '').localeCompare(a.d || ''));
+    // Prima activare validă (cel puțin 10 QSO). În aceeași zi pot fi mai mulți: pota.app nu dă ora, deci toți sunt „primii”
+    const valide = bp.list.filter(a => a.q >= QSO_MINIM && a.d);
+    if (valide.length){
+      const d = valide.reduce((m, a) => a.d < m ? a.d : m, valide[0].d);
+      bp.first = {d, calls: [...new Set(valide.filter(a => a.d === d).map(a => a.call))].sort()};
+      for (const c of bp.first.calls){
+        const bc = byCall[c];
+        bc.deschise = (bc.deschise || 0) + 1;
+        if (!bc.ultDeschis || d > bc.ultDeschis.d) bc.ultDeschis = {ref, d};
+      }
+    }
   }
 }
+// E activarea care a deschis parcul?
+// „Ultima” din clasament o calculăm tot aici, doar din activările valide (clasament.json mai vechi număra și tentativele)
+function ultimaValida(){ lead.forEach(r => r.ultima = byCall[r.indicativ]?.last || null); }
+const ePrima = (ref, a) => { const f = byPark[ref]?.first; return !!f && a.q >= QSO_MINIM && a.d === f.d && f.calls.includes(a.call); };
+const primaTxt = ref => { const f = byPark[ref]?.first; return f ? `<b>${f.calls.map(esc).join(', ')}</b> · ${fmtDate(f.d)}` : ''; };
 
 // ---------- Schimbarea limbii ----------
 function setLang(l, salveaza){
@@ -924,7 +949,7 @@ async function loadData(){
     const [p, m, l, a] = await Promise.all(['parcuri', 'meta', 'clasament', 'activari'].map(f => getJSON(`data/${f}.json`)));
     parks = p.map(x => ({...x, raion: raionName(x.locationDesc)}));
     meta = m; lead = l; activari = a;
-    calculeaza();
+    calculeaza(); ultimaValida();
     parks.forEach(x => { const b = byPark[x.reference]; x.last = b?.last || null; x.ops = b ? b.calls.size : 0;
       x.cauta = norm(x.name + ' ' + x.reference); });   // textul în care se caută
     $('dataErr').textContent = '';
@@ -950,6 +975,7 @@ function fisa(p){                                   // fișa scurtă care se des
     <div class="nm">${esc(p.name)}</div>
     <div class="ln">${esc(p.raion)}</div>
     <div class="ln">${t('fActs')}: <b>${fmt(p.activations)}</b> · ${t('fQso')}: <b>${fmt(p.qsos)}</b></div>
+    ${byPark[p.reference]?.first ? `<div class="ln firstln">${t('fFirst')}: ${primaTxt(p.reference)}</div>` : ''}
     <div class="ln">${t('fLast')}: ${p.last ? fmtDate(p.last) : t('fNever')}</div>
     <div class="acts"><a href="#parcuri/${esc(p.reference)}">${t('history')}</a>
       <a href="https://pota.app/#/park/${esc(p.reference)}" target="_blank" rel="noopener">${t('onPota')}</a></div></div>`;
@@ -1166,20 +1192,21 @@ function renderClasament(){
   const el = $('bigTable');
   if (tab === 'activatori'){
     const rank = Object.fromEntries(lead.map((r, i) => [r.indicativ, i + 1]));
-    const rows = lead.map(r => ({...r, prima: byCall[r.indicativ]?.first || null, rank: rank[r.indicativ]}));
+    const rows = lead.map(r => ({...r, prima: byCall[r.indicativ]?.first || null, deschise: byCall[r.indicativ]?.deschise || 0, rank: rank[r.indicativ]}));
     tabel(el, [
       {k: 'rank', label: t('cRank'), asc: 1, cls: 'rank'},
       {k: 'indicativ', label: t('cCall'), cell: r => `<b>${esc(r.indicativ)}</b>`},
       {k: 'activari', label: t('cActs'), num: 1},
       {k: 'tentative', label: t('cTent'), num: 1},
       {k: 'parcuri', label: t('cParks'), num: 1},
+      {k: 'deschise', label: t('cOpened'), num: 1},
       {k: 'qso', label: t('cQso'), num: 1, cell: r => fmt(r.qso)},
       {k: 'prima', label: t('cFirst'), desc: 1, cls: 'dt', cell: r => fmtDate(r.prima)},
       {k: 'ultima', label: t('cLast'), desc: 1, cls: 'dt', cell: r => fmtDate(r.ultima)},
     ], rows, st.ops, {id: r => r.indicativ, open: openCall, detail: detaliuActivator, redo: renderClasament,
-      sortKeys: ['activari', 'qso', 'parcuri', 'ultima'],
+      sortKeys: ['activari', 'qso', 'parcuri', 'deschise', 'ultima'],
       card: r => `<div class="t"><span class="rk">${r.rank}</span><b>${esc(r.indicativ)}</b></div>
-        <div class="m">${t('nActs')(r.activari)} · ${r.parcuri} ${t('cParks').toLowerCase()} · ${fmt(r.qso)} QSO</div>
+        <div class="m">${t('nActs')(r.activari)} · ${r.parcuri} ${t('cParks').toLowerCase()} · ${fmt(r.qso)} QSO${r.deschise ? ` · ${t('cOpened').toLowerCase()} ${r.deschise}` : ''}</div>
         <div class="m">${r.tentative} ${t('cTent').toLowerCase()} · ${t('cFirst').toLowerCase()} ${fmtDate(r.prima)} · ${t('cLast').toLowerCase()} ${fmtDate(r.ultima)}</div>`,
       click: id => { openCall = openCall === id ? null : id; renderClasament(); }});
     const b = el.querySelector('.det button.go');
@@ -1240,10 +1267,11 @@ function renderAllParks(){
 let histAll = false;                                // telefon: arată tot istoricul parcului deschis
 function istoricParc(p){
   const h = byPark[p.reference]?.list || [];
+  const prima = byPark[p.reference]?.first ? `<div class="firstln">${t('fFirst')}: ${primaTxt(p.reference)}</div>` : '';
   if (mobil && h.length){
     const lim = histAll ? h.length : 3;
     const moduri = a => [a.cw && 'CW', a.ph && t('hPh').toLowerCase(), a.data && 'DATA'].filter(Boolean).join(', ');
-    return `<h3>${t('history')}</h3>` + h.slice(0, lim).map(a => `<div class="hrow"><span>${fmtDate(a.d)} <b>${esc(a.call)}</b></span>
+    return `<h3>${t('history')}</h3>${prima}` + h.slice(0, lim).map(a => `<div class="hrow"><span>${fmtDate(a.d)} <b>${esc(a.call)}</b>${ePrima(p.reference, a) ? `<span class="tag first">${t('firstTag')}</span>` : ''}</span>
         <span>${fmt(a.q)} QSO${a.q < QSO_MINIM ? `<span class="small">${t('under10')}</span>` : ''} · ${moduri(a)}</span></div>`).join('') +
       (h.length > lim ? `<button class="linkbtn" id="histMore" style="margin-top:8px">${t('moreActs')(h.length - lim)}</button>` : '') +
       `<div class="links"><a href="#harta/${esc(p.reference)}">${t('showOnMap')}</a>
@@ -1252,9 +1280,9 @@ function istoricParc(p){
   const links = `<div class="links"><a href="#harta/${esc(p.reference)}">${t('showOnMap')}</a>
     <a href="https://pota.app/#/park/${esc(p.reference)}" target="_blank" rel="noopener">${t('onPota')}</a></div>`;
   if (!h.length) return `<h3>${t('history')}</h3><div class="empty" style="padding:0">${t('histNone')}</div>${links}`;
-  return `<h3>${t('history')}</h3>
+  return `<h3>${t('history')}</h3>${prima}
     <table><tr><th>${t('hDate')}</th><th>${t('hOp')}</th><th class="r">${t('hQso')}</th><th class="r">${t('hCw')}</th><th class="r">${t('hPh')}</th><th class="r">${t('hData')}</th></tr>` +
-    h.map(a => `<tr><td class="dt">${fmtDate(a.d)}</td><td><b>${esc(a.call)}</b></td>
+    h.map(a => `<tr${ePrima(p.reference, a) ? ' class="first"' : ''}><td class="dt">${fmtDate(a.d)}</td><td><b>${esc(a.call)}</b>${ePrima(p.reference, a) ? `<span class="tag first">${t('firstTag')}</span>` : ''}</td>
       <td class="r">${fmt(a.q)}${a.q < QSO_MINIM ? `<span class="small">${t('under10')}</span>` : ''}</td>
       <td class="r">${a.cw || '—'}</td><td class="r">${a.ph || '—'}</td><td class="r">${a.data || '—'}</td></tr>`).join('') +
     `</table>${links}`;
@@ -1294,6 +1322,7 @@ function mdCard(call){
     <div class="stats">${v.map((x, k) => `<div><span class="n">${fmt(x)}</span><small>${K[k]}</small></div>`).join('')}
       <div><span class="n d">${fmtDate(bc.first)}</span><small>${K[4]}</small></div>
       <div><span class="n d">${fmtDate(r.ultima)}</span><small>${K[5]}</small></div></div>
+    ${bc.deschise ? `<div class="row firstln">${t('openedRow')(bc.deschise, esc(bc.ultDeschis.ref), fmtDate(bc.ultDeschis.d))}</div>` : ''}
     <div class="row">${t('modes')}: <b>DATA ${fmt(bc.data)}</b> · <b>${t('phone')} ${fmt(bc.ph)}</b> · <b>CW ${fmt(bc.cw)}</b>
       <div class="split"><i style="width:${bc.data * 100 / tot}%;background:var(--act)"></i><i style="width:${bc.ph * 100 / tot}%;background:#a5c393"></i><i style="width:${bc.cw * 100 / tot}%;background:var(--hi)"></i></div></div>
     ${pk.length ? `<div class="row">${t('topOf')}</div>

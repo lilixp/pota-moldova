@@ -48,7 +48,7 @@ Ordinea etapelor: **stabilizare → pagina web pentru telefon → lansare public
 
 *„Prima activare” se face acum, înainte de lansare.*
 
-- 🔄 **„Prima activare”** a fiecărui parc: cine și când
+- ✅ **„Prima activare”** a fiecărui parc: cine și când (fișa parcului, plăcuța „prima” în istoric, coloana „Primul în” în clasament, rândul din cartonașul Moldova)
 
 Făcute mai devreme decât era planificat:
 
