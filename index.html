@@ -259,6 +259,7 @@ nav a.lnk svg{display:none}
     background:var(--surface);border-top:1px solid var(--line);padding:5px 0 calc(6px + env(safe-area-inset-bottom))}
   nav a.lnk{display:flex;flex-direction:column;align-items:center;gap:2px;padding:3px 0;border:0;font-size:11.5px}
   nav a.lnk svg{display:block;width:24px;height:24px}
+  nav a.lnk[data-v="despre"]{display:none}           /* pe telefon „Despre” e doar în subsol */
   nav a.lnk.on{color:var(--act);border:0}
   .band{display:block;margin-top:12px;font-size:14px;padding:8px 11px}
   .band .dot{display:inline-block;margin-right:7px;vertical-align:1px}
@@ -324,10 +325,24 @@ nav a.lnk svg{display:none}
 footer{margin-top:56px;padding-top:18px;padding-bottom:40px;border-top:1px solid var(--line);color:var(--muted);font-size:13.5px}
 footer p{margin:0;max-width:85ch}
 footer .upd{color:var(--ink);font-weight:700;margin-bottom:6px}
+footer .flinks{margin-bottom:6px}
+footer .flinks a{color:var(--act);font-weight:700}
+/* Pagina Despre: cartonașe cu text */
+.about{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:1000px;padding-bottom:20px}
+.about section{background:var(--surface);border:1px solid var(--line);padding:14px 18px;margin:0}
+.about .full{grid-column:1/-1}
+.about h2{font-size:19px;margin:0 0 8px}
+.about p,.about li{font-size:15px;line-height:1.55;margin:0 0 8px}
+.about ul{margin:0;padding-left:20px}
+.about .cols{display:grid;grid-template-columns:1fr 1fr;gap:0 24px}
+.about .lg p{display:flex;align-items:center;gap:8px}
+.about .official{background:var(--hi-soft);padding:8px 12px;font-weight:700;margin-top:4px}
+.about .contact{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+.about .contact a,.about .contact button{font:700 14px var(--body);color:var(--act);background:var(--act-soft);border:1px solid var(--act);border-radius:99px;padding:8px 14px;text-decoration:none;cursor:pointer}
 
 /* ---------- Ecrane mai înguste (varianta pentru telefon vine separat) ---------- */
 @media (max-width:900px){
-  .hero,.two,.bigmap{grid-template-columns:1fr}
+  .hero,.two,.bigmap,.about,.about .cols{grid-template-columns:1fr}
   #map{height:420px}
   nav .wrap{gap:14px}
 }
@@ -343,6 +358,7 @@ footer .upd{color:var(--ink);font-weight:700;margin-bottom:6px}
       <a class="lnk" href="#harta" data-v="harta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M3 6.5l6-2.5 6 2.5 6-2.5v13.5l-6 2.5-6-2.5-6 2.5z"/><path d="M9 4v13.5M15 6.5V20"/></svg><span data-t="navMap"></span></a>
       <a class="lnk" href="#clasament" data-v="clasament"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4v1.5A3 3 0 0 0 7 10.5M17 6h3v1.5a3 3 0 0 1-3 3"/></svg><span data-t="navLead"></span></a>
       <a class="lnk" href="#parcuri" data-v="parcuri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3L3.5 11h3L4 15.5h8L9.5 11h3z"/><path d="M8 15.5V21M16 21v-4"/><path d="M16.5 7L13 13h2.5l-2 4h6l-2-4H20z"/></svg><span data-t="navParks"></span></a>
+      <a class="lnk" href="#despre" data-v="despre"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg><span data-t="navAbout"></span></a>
     </div>
     <div class="lang" role="group" aria-label="Limba / Language">
       <button data-lang="ro" lang="ro">RO</button><button data-lang="en" lang="en">EN</button>
@@ -476,7 +492,13 @@ footer .upd{color:var(--ink);font-weight:700;margin-bottom:6px}
   <div id="allParks"></div>
 </main>
 
-<footer class="wrap"><p class="upd" id="updLine"></p><p data-t="footer"></p></footer>
+<!-- ===================== PAGINA „DESPRE” ===================== -->
+<main class="wrap view" id="v-despre" hidden>
+  <div class="ptitle"><h1 data-t="aboutTitle"></h1><p class="sub" data-t="aboutSub"></p></div>
+  <div class="about" data-t="aboutHtml"></div>
+</main>
+
+<footer class="wrap"><p class="upd" id="updLine"></p><p class="flinks"><a href="#despre" data-t="aboutLink"></a></p><p data-t="footer"></p></footer>
 
 <!-- Butonul „Sus”: apare după ce derulezi mult -->
 <button class="totop" id="totop" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg><span data-t="toTop"></span></button>
@@ -499,6 +521,32 @@ const T = {
   ro: {
     locale: 'ro-RO',
     navNow: 'Acum', navMap: 'Hartă', navLead: 'Clasament', navParks: 'Parcuri',
+    navAbout: 'Despre', aboutLink: 'Despre această pagină: date, reguli, contact',
+    aboutTitle: 'Despre ER POTA Tracker', aboutSub: 'Ce arată pagina, de unde vin datele și cum se calculează cifrele.',
+    aboutHtml: `<section><h2>Ce este</h2>
+      <p>O pagină neoficială cu statisticile parcurilor Parks on the Air® din Republica Moldova: harta tuturor parcurilor, cine e în aer acum, clasamentul activatorilor și istoricul fiecărui parc.</p>
+      <p>Este un proiect independent, necomercial, făcut pentru activatorii și hunterii din Moldova și de pretutindeni.</p></section>
+    <section><h2>De unde vin datele</h2><ul>
+      <li>Toate datele vin de la ${POTA}.</li>
+      <li><b>Parcurile și clasamentele</b> se actualizează automat o dată pe zi. Data exactă e în subsolul paginii.</li>
+      <li><b>Spoturile live</b> se citesc o dată pe minut, doar cât timp pagina e deschisă.</li>
+      <li>Cererile sunt rare și se identifică, ca să nu încărcăm serverele POTA.</li></ul></section>
+    <section class="full"><h2>Cum se calculează</h2><div class="cols"><div>
+      <p><b>Activare validă:</b> cel puțin <b>10 QSO</b> într-o zi (UTC) dintr-un parc, ca pe pota.app.</p>
+      <p><b>Tentativă:</b> sub 10 QSO. Apare în istoric, dar nu intră în numărul de activări.</p>
+      <p><b>Prima activare:</b> prima activare validă a parcului. Dacă doi operatori au activat în aceeași zi, sunt amândoi „primii”, pentru că pota.app nu dă ora.</p></div><div>
+      <p><b>Primul în:</b> în câte parcuri un activator a făcut prima activare.</p>
+      <p><b>Indicativele cu /P, /QRP sau prefix</b> (de exemplu F/ER1SKI) se adună la indicativul de bază, la fel ca pe pota.app.</p>
+      <p><b>Cartonașul Global</b> vine din profilul public pota.app și numără doar activările valide.</p></div></div></section>
+    <section class="lg"><h2>Culorile de pe hartă</h2><p><span class="mk act"></span>activat cel puțin o dată</p><p><span class="mk no"></span>încă neactivat</p><p><span class="mk live"></span>în aer acum (spot pe pota.app)</p><p><span class="mk tent"></span>doar tentative (când e scris un indicativ)</p></section>
+    <section><h2>Dacă cifrele diferă de pota.app</h2>
+      <p>Pagina se actualizează o dată pe zi, așa că o activare nouă poate apărea aici cu până la o zi întârziere.</p>
+      <p class="official">Datele oficiale sunt întotdeauna cele de pe pota.app.</p></section>
+    <section class="full"><h2>Cine a făcut pagina</h2>
+      <p><b>ER1PL (Lilian Putină)</b>, activator POTA și <i>POTA mapping representative</i> pentru Moldova (ER). Pagina nu este afiliată cu Parks on the Air®.</p>
+      <p>Mulțumiri: <b>pota.app</b> pentru date, <a href="${OSM}" target="_blank" rel="noopener">OpenStreetMap</a> și <a href="https://leafletjs.com" target="_blank" rel="noopener">Leaflet</a> pentru hartă. <a href="https://github.com/lilixp/pota-moldova" target="_blank" rel="noopener">Codul sursă</a> e public pe GitHub.</p>
+      <p><b>Observații sau idei?</b> Scrie-i lui ER1PL:</p>
+      <div class="contact"><a href="https://www.qrz.com/db/ER1PL" target="_blank" rel="noopener">Profilul ER1PL pe QRZ.com</a><button type="button" class="mailBtn">Scrie un email</button></div></section>`,
     title: 'Parcurile POTA din Moldova',
     note: `Proiect independent, neoficial. Date de la ${POTA}, actualizate zilnic. Nu este un site oficial Parks on the Air.`,
     loading: 'Se încarcă…',
@@ -584,6 +632,32 @@ const T = {
   en: {
     locale: 'en-GB',
     navNow: 'Now', navMap: 'Map', navLead: 'Leaderboard', navParks: 'Parks',
+    navAbout: 'About', aboutLink: 'About this page: data, rules, contact',
+    aboutTitle: 'About ER POTA Tracker', aboutSub: 'What the page shows, where the data comes from and how the numbers are calculated.',
+    aboutHtml: `<section><h2>What it is</h2>
+      <p>An unofficial statistics page for Parks on the Air® in the Republic of Moldova: a map of all parks, who is on the air now, the activator leaderboard and the history of every park.</p>
+      <p>It is an independent, non-commercial project for activators and hunters in Moldova and everywhere else.</p></section>
+    <section><h2>Where the data comes from</h2><ul>
+      <li>All data comes from ${POTA}.</li>
+      <li><b>Parks and leaderboards</b> are updated automatically once a day. The exact time is in the page footer.</li>
+      <li><b>Live spots</b> are read once a minute, only while the page is open.</li>
+      <li>Requests are rare and identify the project, so the POTA servers are not loaded.</li></ul></section>
+    <section class="full"><h2>How it is calculated</h2><div class="cols"><div>
+      <p><b>Valid activation:</b> at least <b>10 QSOs</b> from a park in one day (UTC), as on pota.app.</p>
+      <p><b>Attempt:</b> under 10 QSOs. Shown in the history, but not counted as an activation.</p>
+      <p><b>First activation:</b> the first valid activation of a park. If two operators activated it on the same day, both are “first”, because pota.app does not give the time.</p></div><div>
+      <p><b>First in:</b> how many parks an activator was the first to activate.</p>
+      <p><b>Callsigns with /P, /QRP or a prefix</b> (e.g. F/ER1SKI) count under the base callsign, as on pota.app.</p>
+      <p><b>The Global card</b> comes from the public pota.app profile and counts valid activations only.</p></div></div></section>
+    <section class="lg"><h2>Map colours</h2><p><span class="mk act"></span>activated at least once</p><p><span class="mk no"></span>not activated yet</p><p><span class="mk live"></span>on the air now (spot on pota.app)</p><p><span class="mk tent"></span>attempts only (with a callsign typed)</p></section>
+    <section><h2>If the numbers differ from pota.app</h2>
+      <p>The page is updated once a day, so a new activation may show up here up to one day later.</p>
+      <p class="official">The official data is always the one on pota.app.</p></section>
+    <section class="full"><h2>Who made it</h2>
+      <p><b>ER1PL (Lilian Putină)</b>, POTA activator and <i>POTA mapping representative</i> for Moldova (ER). This page is not affiliated with Parks on the Air®.</p>
+      <p>Thanks to <b>pota.app</b> for the data, <a href="${OSM}" target="_blank" rel="noopener">OpenStreetMap</a> and <a href="https://leafletjs.com" target="_blank" rel="noopener">Leaflet</a> for the map. The <a href="https://github.com/lilixp/pota-moldova" target="_blank" rel="noopener">source code</a> is public on GitHub.</p>
+      <p><b>Feedback or ideas?</b> Contact ER1PL:</p>
+      <div class="contact"><a href="https://www.qrz.com/db/ER1PL" target="_blank" rel="noopener">ER1PL on QRZ.com</a><button type="button" class="mailBtn">Send an email</button></div></section>`,
     title: 'POTA parks in Moldova',
     note: `Independent, unofficial project. Data from ${POTA}, updated daily. This is not an official Parks on the Air website.`,
     loading: 'Loading…',
@@ -840,7 +914,7 @@ $$('.fchips').forEach(box => box.onclick = e => {
 function route(){
   const [v, ...rest] = decodeURIComponent(location.hash.slice(1)).split('/'), arg = rest.join('/');
   const prev = view;
-  view = ['harta', 'clasament', 'parcuri'].includes(v) ? v : 'acum';
+  view = ['harta', 'clasament', 'parcuri', 'despre'].includes(v) ? v : 'acum';
   $$('.view').forEach(el => el.hidden = el.id !== 'v-' + view);
   document.body.className = 'v-' + view;
   setTitle();            // pe telefon, pagina Hartă ascunde banda și subsolul
@@ -865,7 +939,7 @@ window.addEventListener('hashchange', route);
 
 // Titlul filei: „Hartă – ER POTA Tracker” etc.; pe pagina Acum doar numele
 function setTitle(){
-  const k = {harta: 'navMap', clasament: 'navLead', parcuri: 'navParks'}[view];
+  const k = {harta: 'navMap', clasament: 'navLead', parcuri: 'navParks', despre: 'navAbout'}[view];
   document.title = k ? `${t(k)} – ER POTA Tracker` : 'ER POTA Tracker';
 }
 function renderUpd(){
@@ -1319,6 +1393,14 @@ function showCall(){
 }
 $('btnCall').onclick = showCall;
 $('call').onkeydown = e => { if (e.key === 'Enter') showCall(); };
+
+// ---------- Emailul de pe pagina Despre ----------
+// Adresa se compune abia la clic, ca roboții care strâng adrese din pagini să n-o găsească
+document.addEventListener('click', e => {
+  if (!e.target.closest('.mailBtn')) return;
+  const u = ['putina', 'lilian'].join(''), d = ['gmail', 'com'].join('.');
+  location.href = 'mailto:' + u + '@' + d + '?subject=' + encodeURIComponent('ER POTA Tracker');
+});
 
 // ---------- Butonul „Sus” ----------
 window.addEventListener('scroll', () => { $('totop').hidden = scrollY < 700; }, {passive: true});

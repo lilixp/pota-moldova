@@ -22,6 +22,7 @@ Unofficial statistics for the **Parks on the Air (POTA)** parks in the Republic 
 
 - **Callsign stats** in two cards: **Moldova** (from this page's daily data) and **Global** (live from the public pota.app profile).
 - **Romanian / English**, chosen automatically from the browser, switchable with the RO | EN button, or forced with `?lang=en`.
+- **About** page (`#despre`): data sources, calculation rules, map colours and contact.
 - **Direct links** you can share: `#harta/MD-0066` (map centred on a park), `#parcuri/MD-0066` (park history), `#clasament/ER1PL` (an activator).
 - Map markers: **green dot** = activated, **red dot** = not activated yet, **blue dot with pulse** = on the air now. With a callsign typed: green = activated by that callsign, **orange** = attempts only (under 10 QSOs), red = not activated by it.
 - Callsigns with `/P`, `/QRP` or a prefix (`F/ER1SKI`) are looked up under the base callsign, as pota.app does.
