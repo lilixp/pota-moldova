@@ -167,14 +167,8 @@ button.call:hover{color:var(--act);text-decoration:underline}
 .tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:6px}
 .tabs a{padding:8px 14px;text-decoration:none;color:var(--muted);font-weight:700;border-bottom:3px solid transparent;margin-bottom:-1px}
 .tabs a.on{color:var(--ink);border-bottom-color:var(--act)}
-.bar.mini{height:6px;background:var(--act-soft);min-width:80px}
-.bar.mini i{display:block;height:100%;background:var(--act)}
 
 /* ---------- Raioane (rezumat) ---------- */
-.rai{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px 24px;font-size:15px}
-.rai .bar{height:6px;background:var(--act-soft);margin-top:5px}
-.rai .bar i{display:block;height:100%;background:var(--act)}
-.rai span{color:var(--muted);font-variant-numeric:tabular-nums}
 
 /* ---------- Câmpuri ---------- */
 .tools{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;align-items:center}
@@ -231,7 +225,6 @@ nav a.lnk svg{display:none}
 .pc .chev{position:absolute;right:14px;top:15px;width:9px;height:9px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg)}
 .pc.open .chev{transform:rotate(-135deg);top:19px}
 .pc .det{margin-top:10px;padding-top:10px;border-top:1px solid var(--line);cursor:auto}
-.pc .bar.mini{margin-top:6px}
 .hrow{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid var(--line);padding:6px 0;font-size:13.5px}
 .sp{flex-basis:100%;font-size:14px;padding:3px 0}
 /* Harta mare pe telefon: buton „Filtre”, panou care urcă de jos, fișa parcului */
@@ -395,19 +388,11 @@ footer .upd{color:var(--ink);font-weight:700;margin-bottom:6px}
   </section>
 
   <section>
-    <h2 data-t="raionTitle"></h2>
-    <p class="sub" data-t="raionSub"></p>
-    <div class="rai" id="raioane"></div>
-    <a class="more" href="#clasament/raioane" data-t="raionAll"></a>
-  </section>
-
-  <section>
     <h2 data-t="searchTitle"></h2>
     <div class="tools" style="margin-top:12px">
       <input id="q" data-t-ph="search" style="flex:1;min-width:220px" autocomplete="off">
       <select id="fAct" class="fAct"></select>
       <div class="fchips" data-for="fAct"></div>
-      <select id="fRaion" class="fRaion"></select>
     </div>
     <div id="parks"></div>
     <!-- „Arată încă 10” adaugă următoarele 10 parcuri sub cele afișate -->
@@ -449,7 +434,6 @@ footer .upd{color:var(--ink);font-weight:700;margin-bottom:6px}
         <!-- Apare doar când e scris un indicativ: parcurile unde are numai tentative -->
         <div class="tentLg" id="lgTent" hidden><span class="mk tent"></span><span data-t="lgTent"></span></div>
       </div>
-      <div><h3><label for="mRaion" data-t="mapRaion"></label></h3><select id="mRaion" class="fRaion"></select></div>
       <div><h3><label for="mQ" data-t="mapSearch"></label></h3><input type="search" id="mQ" data-t-ph="search" autocomplete="off"></div>
       <div class="cnt" id="mCount"></div>
       <button class="go sheetok" id="sheetOk"></button>
@@ -469,7 +453,6 @@ footer .upd{color:var(--ink);font-weight:700;margin-bottom:6px}
   <div class="tabs">
     <a href="#clasament" data-tab="activatori" data-t="tabOps"></a>
     <a href="#clasament/parcuri" data-tab="parcuri" data-t="tabParks"></a>
-    <a href="#clasament/raioane" data-tab="raioane" data-t="tabRaion"></a>
   </div>
   <p class="sub" id="tabNote"></p>
   <div id="bigTable"></div>
@@ -482,7 +465,6 @@ footer .upd{color:var(--ink);font-weight:700;margin-bottom:6px}
     <input id="pQ" data-t-ph="search" style="flex:1;min-width:220px" autocomplete="off">
     <select id="pAct" class="fAct"></select>
     <div class="fchips" data-for="pAct"></div>
-    <select id="pRaion" class="fRaion"></select>
   </div>
   <div id="allParks"></div>
 </main>
@@ -533,9 +515,8 @@ const T = {
     allLead: 'Tot clasamentul',
     topTitle: 'Top parcuri', topSub: 'Top 10 · după numărul de QSO-uri',
     topHead: ['Parc', '', 'QSO'], allTop: 'Toate parcurile după QSO',
-    raionTitle: 'Pe raioane', raionSub: 'Parcuri activate din total', raionAll: 'Toate raioanele',
     searchTitle: 'Caută un parc', search: 'Nume sau referință, de exemplu Codru',
-    fAll: 'Toate', fYes: 'Doar activate', fNo: 'Doar neactivate', allRaion: 'Toate raioanele',
+    fAll: 'Toate', fYes: 'Doar activate', fNo: 'Doar neactivate',
     // Telefon
     spotsNA: 'Spoturile live nu sunt disponibile acum.',
     updLine: d => `Date actualizate la ${d}.`,
@@ -564,7 +545,7 @@ const T = {
     tentRow: (a, p) => `Tentative sub 10 QSO: <b>${a}</b> · parcuri doar cu tentative: <b>${p}</b>`,
     glNote: 'Live din profilul public pota.app, la cererea ta. Doar activările valide (cel puțin 10 QSO), ca pe pota.app.',
     // Pagina Hartă
-    mapPageTitle: 'Harta parcurilor', mapShow: 'Arată pe hartă', mapRaion: 'Raion', mapSearch: 'Caută', mapCall: 'Parcurile unui indicativ',
+    mapPageTitle: 'Harta parcurilor', mapShow: 'Arată pe hartă', mapSearch: 'Caută', mapCall: 'Parcurile unui indicativ',
     callCnt: (c, n, tot) => `${c}: ${n} din ${tot} ${de(tot)}parcuri (${n * 100 / tot < 1 ? '<1' : Math.round(n * 100 / tot)}%)`,
     callZero: c => `${c} nu are activări valide în parcurile MD.`,
     lgActBy: c => `activat de ${c}`, lgNoBy: c => `neactivat de ${c}`,
@@ -575,13 +556,11 @@ const T = {
     openedRow: (n, ref, d) => `Primul în <b>${n}</b> ${n === 1 ? 'parc' : de(n) + 'parcuri'} MD · cel mai recent: ${ref}, ${d}`,
     history: 'Istoricul activărilor', onPota: 'Pagina parcului pe pota.app', showOnMap: 'Vezi pe hartă',
     // Pagina Clasament
-    leadPageTitle: 'Clasamente', tabOps: 'Activatori', tabParks: 'Parcuri', tabRaion: 'Raioane',
+    leadPageTitle: 'Clasamente', tabOps: 'Activatori', tabParks: 'Parcuri',
     noteOps: 'Toți activatorii din parcurile MD. Activare validă: cel puțin 10 QSO-uri; tentativă: sub 10. Clic pe un rând pentru parcurile activate.',
     noteParks: 'Parcurile MD cu cel puțin o activare. Clic pe un rând pentru istoric.',
-    noteRaion: 'Toate raioanele, cu parcurile și activitatea lor.',
     cRank: '#', cCall: 'Indicativ', cActs: 'Activări', cTent: 'Tentative', cParks: 'Parcuri', cQso: 'QSO',
-    cFirst: 'Prima', cLast: 'Ultima', cRef: 'Ref.', cPark: 'Parc', cRaion: 'Raion', cOps: 'Activatori',
-    cActd: 'Activate', cPct: '%',
+    cFirst: 'Prima', cLast: 'Ultima', cRef: 'Ref.', cPark: 'Parc', cOps: 'Activatori', fGrid: 'Locator',
     opsParks: n => `Parcuri MD activate (${n})`, globalBtn: 'Statistici POTA globale',
     // Pagina Parcuri
     parksTitle: n => `Toate cele ${n} ${de(n)}parcuri`,
@@ -622,9 +601,8 @@ const T = {
     allLead: 'Full leaderboard',
     topTitle: 'Top parks', topSub: 'Top 10 · by number of QSOs',
     topHead: ['Park', '', 'QSOs'], allTop: 'All parks by QSOs',
-    raionTitle: 'By district', raionSub: 'Activated parks out of total', raionAll: 'All districts',
     searchTitle: 'Find a park', search: 'Name or reference, for example Codru',
-    fAll: 'All', fYes: 'Activated only', fNo: 'Not activated only', allRaion: 'All districts',
+    fAll: 'All', fYes: 'Activated only', fNo: 'Not activated only',
     spotsNA: 'Live spots are not available right now.',
     updLine: d => `Data updated ${d}.`,
     toTop: 'Top', filters: 'Filters', resetF: 'Reset filters', close: 'Close', sortBy: 'Sort:',
@@ -650,7 +628,7 @@ const T = {
     inMd: n => `${n} in Moldova`, elsewhere: (n, a) => `${n} in other countries (${a} ${a === 1 ? 'activation' : 'activations'})`,
     tentRow: (a, p) => `Attempts under 10 QSOs: <b>${a}</b> · parks with attempts only: <b>${p}</b>`,
     glNote: 'Live from the public pota.app profile, on request. Valid activations only (at least 10 QSOs), as on pota.app.',
-    mapPageTitle: 'Park map', mapShow: 'Show on the map', mapRaion: 'District', mapSearch: 'Search', mapCall: 'Parks of a callsign',
+    mapPageTitle: 'Park map', mapShow: 'Show on the map', mapSearch: 'Search', mapCall: 'Parks of a callsign',
     callCnt: (c, n, tot) => `${c}: ${n} of ${tot} parks (${n * 100 / tot < 1 ? '<1' : Math.round(n * 100 / tot)}%)`,
     callZero: c => `${c} has no valid activations in MD parks.`,
     lgActBy: c => `activated by ${c}`, lgNoBy: c => `not activated by ${c}`,
@@ -660,13 +638,11 @@ const T = {
     fFirst: 'First activation', firstTag: 'first', cOpened: 'First in',
     openedRow: (n, ref, d) => `First to activate <b>${n}</b> MD ${n === 1 ? 'park' : 'parks'} · most recent: ${ref}, ${d}`,
     history: 'Activation history', onPota: 'Park page on pota.app', showOnMap: 'Show on map',
-    leadPageTitle: 'Leaderboards', tabOps: 'Activators', tabParks: 'Parks', tabRaion: 'Districts',
+    leadPageTitle: 'Leaderboards', tabOps: 'Activators', tabParks: 'Parks',
     noteOps: 'All activators in MD parks. Valid activation: at least 10 QSOs; attempt: under 10. Click a row to see their parks.',
     noteParks: 'MD parks with at least one activation. Click a row for its history.',
-    noteRaion: 'All districts, with their parks and activity.',
     cRank: '#', cCall: 'Callsign', cActs: 'Activations', cTent: 'Attempts', cParks: 'Parks', cQso: 'QSOs',
-    cFirst: 'First', cLast: 'Last', cRef: 'Ref.', cPark: 'Park', cRaion: 'District', cOps: 'Activators',
-    cActd: 'Activated', cPct: '%',
+    cFirst: 'First', cLast: 'Last', cRef: 'Ref.', cPark: 'Park', cOps: 'Activators', fGrid: 'Grid locator',
     opsParks: n => `MD parks activated (${n})`, globalBtn: 'Global POTA stats',
     parksTitle: n => `All ${n} parks`,
     parksPageNote: 'Click a row for its activation history. Click a column title to sort.',
@@ -681,15 +657,6 @@ const T = {
       <a href="${SRC}" target="_blank" rel="noopener">Source code on GitHub</a>.`,
   },
 };
-
-// Raioanele după codul ISO folosit de POTA (locationDesc); nume proprii, la fel în ambele limbi
-const RAION = {AN:'Anenii Noi',BS:'Basarabeasca',BR:'Briceni',CA:'Cahul',CT:'Cantemir',CL:'Călărași',
-  CS:'Căușeni',CM:'Cimișlia',CR:'Criuleni',DO:'Dondușeni',DR:'Drochia',DU:'Dubăsari',ED:'Edineț',
-  FA:'Fălești',FL:'Florești',GL:'Glodeni',HI:'Hîncești',IA:'Ialoveni',LE:'Leova',NI:'Nisporeni',
-  OC:'Ocnița',OR:'Orhei',RE:'Rezina',RI:'Rîșcani',SI:'Sîngerei',SO:'Soroca',ST:'Strășeni',
-  SD:'Șoldănești',SV:'Ștefan Vodă',TA:'Taraclia',TE:'Telenești',UN:'Ungheni',BA:'Bălți',
-  BD:'Bender',CU:'Chișinău',GA:'Găgăuzia',SN:'Stânga Nistrului'};
-const raionName = code => { const k = (code||'').split(',')[0].replace('MD-',''); return RAION[k] || code || '—'; };
 
 // ---------- Utilitare ----------
 const $ = id => document.getElementById(id);
@@ -792,7 +759,7 @@ let view = 'acum', onlyWaiting = false;
 let map, layer, map2, layer2, markers2 = {};
 const st = {                                        // ordinea de sortare a fiecărui tabel
   home: {key: 'reference', dir: 1}, ops: {key: 'activari', dir: -1}, tparks: {key: 'qsos', dir: -1},
-  rai: {key: 'n', dir: -1}, all: {key: 'reference', dir: 1},
+  all: {key: 'reference', dir: 1},
 };
 let tab = 'activatori', openCall = null, openPark = null;
 const mdSpots = () => (spots || []).filter(s => (s.reference || '').startsWith('MD-'));
@@ -851,7 +818,7 @@ function setLang(l, salveaza){
   $$('.fchips').forEach(box => box.innerHTML = [['all', 'chAll'], ['yes', 'chYes'], ['no', 'chNo']]
     .map(([v, k]) => `<button class="chip" data-v="${v}">${t(k)}</button>`).join(''));
   syncChips();
-  fillRaionSelects(); renderLive(); renderView(); renderCall(); setTitle(); renderUpd();
+  renderLive(); renderView(); renderCall(); setTitle(); renderUpd();
 }
 $$('.lang button').forEach(b => b.onclick = () => setLang(b.dataset.lang, true));
 // Butoanele rotunde schimbă lista ascunsă de alături (aceeași logică de filtrare ca pe PC)
@@ -875,11 +842,11 @@ function route(){
   $('homeTitle').hidden = view !== 'acum';
   $$('nav a.lnk').forEach(a => a.classList.toggle('on', a.dataset.v === view));
   if (view === 'clasament'){
-    tab = ['parcuri', 'raioane'].includes(arg) ? arg : 'activatori';
+    tab = arg === 'parcuri' ? 'parcuri' : 'activatori';
     if (arg && tab === 'activatori') openCall = baza(arg.toUpperCase());
   }
   if (view === 'parcuri' && arg){                  // #parcuri/MD-0066 = deschide istoricul acelui parc
-    openPark = arg.toUpperCase(); histAll = false; $('pQ').value = ''; $('pAct').value = 'all'; $('pRaion').value = '';
+    openPark = arg.toUpperCase(); histAll = false; $('pQ').value = ''; $('pAct').value = 'all';
   }
   renderView();
   if (view === 'harta') focusPark(arg ? arg.toUpperCase() : null);
@@ -901,7 +868,7 @@ function renderUpd(){
 }
 function renderView(){
   if (!parks.length) return;
-  if (view === 'acum'){ renderKpis(); renderMap(); renderLead(); renderTop(); renderRaioane(); renderParks(); }
+  if (view === 'acum'){ renderKpis(); renderMap(); renderLead(); renderTop(); renderParks(); }
   if (view === 'harta') renderMap2();
   if (view === 'clasament') renderClasament();
   if (view === 'parcuri') renderAllParks();
@@ -947,24 +914,17 @@ function renderLive(){
 async function loadData(){
   try {
     const [p, m, l, a] = await Promise.all(['parcuri', 'meta', 'clasament', 'activari'].map(f => getJSON(`data/${f}.json`)));
-    parks = p.map(x => ({...x, raion: raionName(x.locationDesc)}));
+    parks = p;
     meta = m; lead = l; activari = a;
     calculeaza(); ultimaValida();
     parks.forEach(x => { const b = byPark[x.reference]; x.last = b?.last || null; x.ops = b ? b.calls.size : 0;
+      x.primaD = b?.first?.d || null;                 // data primei activări valide (pentru sortare)
       x.cauta = norm(x.name + ' ' + x.reference); });   // textul în care se caută
     $('dataErr').textContent = '';
     renderUpd();
-    fillRaionSelects();
     renderLive();
     route();
   } catch (e) { $('dataErr').textContent = errText(e); }
-}
-
-function fillRaionSelects(){
-  const names = [...new Set(parks.map(p => p.raion))].sort((a,b) => a.localeCompare(b,'ro'));
-  $$('.fRaion').forEach(sel => { const cur = sel.value;
-    sel.innerHTML = `<option value="">${t('allRaion')}</option>` + names.map(n => `<option>${esc(n)}</option>`).join('');
-    sel.value = cur; });
 }
 
 
@@ -973,7 +933,7 @@ function fisa(p){                                   // fișa scurtă care se des
   const done = p.activations > 0;
   return `<div class="fisa">${refTag(p.reference, done)}
     <div class="nm">${esc(p.name)}</div>
-    <div class="ln">${esc(p.raion)}</div>
+    <div class="ln">${t('fGrid')}: <b>${esc(p.grid)}</b></div>
     <div class="ln">${t('fActs')}: <b>${fmt(p.activations)}</b> · ${t('fQso')}: <b>${fmt(p.qsos)}</b></div>
     ${byPark[p.reference]?.first ? `<div class="ln firstln">${t('fFirst')}: ${primaTxt(p.reference)}</div>` : ''}
     <div class="ln">${t('fLast')}: ${p.last ? fmtDate(p.last) : t('fNever')}</div>
@@ -1057,24 +1017,12 @@ function renderTop(){
     rows.map(p => `<tr><td>${refTag(p.reference)}</td><td class="name" title="${esc(p.name)}">${esc(shortName(p.name))}</td>
       <td class="r">${fmt(p.qsos)}</td></tr>`).join('');
 }
-function raionStats(){
-  const g = {};
-  parks.forEach(p => { const r = g[p.raion] ||= {raion: p.raion, n: 0, a: 0, acts: 0, q: 0};
-    r.n++; if (p.activations > 0) r.a++; r.acts += p.activations || 0; r.q += p.qsos || 0; });
-  return Object.values(g).map(r => ({...r, pct: Math.round(r.a * 100 / r.n)}));
-}
-function renderRaioane(){
-  const rows = raionStats().sort((a,b) => b.n - a.n || a.raion.localeCompare(b.raion, 'ro')).slice(0, 10);
-  $('raioane').innerHTML = rows.map(r => `<div>${esc(r.raion)} <span>${r.a}/${r.n}</span>
-    <div class="bar"><i style="width:${r.pct}%"></i></div></div>`).join('');
-}
 // Filtrul comun al căutărilor de parcuri
-function filtreaza(q, fa, fr){
+function filtreaza(q, fa){
   q = norm(q.trim());
   return parks.filter(p =>
     (!q || p.cauta.includes(q)) &&
-    (fa === 'all' || (fa === 'yes') === (p.activations > 0)) &&
-    (!fr || p.raion === fr));
+    (fa === 'all' || (fa === 'yes') === (p.activations > 0)));
 }
 // Coloanele tabelului de parcuri (pe pagina Acum și pe pagina Parcuri)
 function parkCols(extra){
@@ -1082,7 +1030,7 @@ function parkCols(extra){
   return [
     {k: 'reference', label: t('cRef'), cell: p => refTag(p.reference, p.activations > 0)},
     {k: 'name', label: t('cPark'), cell: p => esc(p.name) + (live.has(p.reference) ? '<span class="tag live">LIVE</span>' : '')},
-    {k: 'raion', label: t('cRaion')},
+    {k: 'primaD', label: t('fFirst'), cell: p => byPark[p.reference]?.first ? byPark[p.reference].first.calls.map(esc).join(', ') : '—'},
     {k: 'activations', label: t('cActs'), num: 1, cell: p => fmt(p.activations)},
     {k: 'qsos', label: t('cQso'), num: 1, cell: p => fmt(p.qsos)},
     ...(extra ? [{k: 'last', label: t('cLast'), desc: 1, cls: 'dt', cell: p => p.last ? fmtDate(p.last) : '—'}] : []),
@@ -1092,14 +1040,14 @@ function parkCols(extra){
 function parkCard(p, extra){
   const done = p.activations > 0, live = liveSet().has(p.reference);
   return `<div class="t">${refTag(p.reference, done)}<b>${esc(numeRo(p.name))}</b>${live ? '<span class="tag live">LIVE</span>' : ''}</div>
-    <div class="m">${esc(p.raion)} · ${done ? `${t('nActs')(p.activations)} · ${fmt(p.qsos)} QSO` : t('fNever')}</div>` +
+    <div class="m">${done ? `${t('nActs')(p.activations)} · ${fmt(p.qsos)} QSO` : t('fNever')}</div>` +
     (extra && p.last ? `<div class="m">${t('cLast').toLowerCase()} ${fmtDate(p.last)}</div>` : '');
 }
 let homeShown = TOP;                                // câte parcuri arată lista de pe pagina Acum
 function renderParks(){
-  const q = $('q').value, fa = $('fAct').value, fr = $('fRaion').value;
-  const filtered = q.trim() || fa !== 'all' || fr;
-  const rows = filtreaza(q, fa, fr);
+  const q = $('q').value, fa = $('fAct').value;
+  const filtered = q.trim() || fa !== 'all';
+  const rows = filtreaza(q, fa);
   tabel($('parks'), parkCols(), rows, st.home,
     {limit: filtered ? 0 : homeShown, empty: t('noParks'), redo: renderParks, card: p => parkCard(p)});
   syncChips();
@@ -1110,14 +1058,14 @@ function renderParks(){
   $('parksAllLink').textContent = t('parksAll')(parks.length);
 }
 $('btnMore').onclick = () => { homeShown += TOP; renderParks(); };
-['q', 'fAct', 'fRaion'].forEach(id => $(id).addEventListener('input', renderParks));
+['q', 'fAct'].forEach(id => $(id).addEventListener('input', renderParks));
 
 // ---------- Pagina Hartă ----------
 function renderMap2(){
   if (!window.L){ $('map2').innerHTML = `<div class="err" style="padding:12px">${t('errMap')}</div>`; return; }
   if (!map2) map2 = newMap('map2');
   else map2.invalidateSize();
-  const live = liveSet(), q = norm($('mQ').value.trim()), fr = $('mRaion').value;
+  const live = liveSet(), q = norm($('mQ').value.trim());
   // Indicativul scris (F/ER1SKI -> ER1SKI): verde devine „activat de el”
   const raw = $('mCall').value.trim().toUpperCase().replace(/\s+/g, ''), call = raw ? baza(raw) : '';
   const mele = byCall[call]?.parks || {};
@@ -1134,15 +1082,16 @@ function renderMap2(){
   const list = parks.filter(p => {
     const g = live.has(p.reference) ? 'live' : activ(p) ? 'act' : 'no';
     return ((g === 'act' && $('cbAct').checked) || (g === 'no' && $('cbNo').checked) || (g === 'live' && $('cbLive').checked)) &&
-      (!fr || p.raion === fr) && (!q || p.cauta.includes(q));
+      (!q || p.cauta.includes(q));
   });
+  pctHarta = list.map(p => [p.latitude, p.longitude]);
   if (layer2) layer2.remove();
   layer2 = L.layerGroup().addTo(map2);
   markers2 = {};
   drawParks(layer2, list, markers2, mobil, activ, call ? tent : undefined);
   $('mCount').textContent = t('mapCount')(list.length);
   // Câte filtre sunt schimbate față de „tot” (pentru „Filtre (2)” și „Resetează filtrele”)
-  const nF = ['cbAct', 'cbNo', 'cbLive'].filter(id => !$(id).checked).length + (fr ? 1 : 0) + (q ? 1 : 0) + (call ? 1 : 0);
+  const nF = ['cbAct', 'cbNo', 'cbLive'].filter(id => !$(id).checked).length + (q ? 1 : 0) + (call ? 1 : 0);
   $('resetF').hidden = nF === 0;
   $('fabTxt').textContent = `${t('filters')}${nF ? ` (${nF})` : ''} · ${t('mapCount')(list.length).replace(/ pe hartă| on the map/, '')}`;
   $('sheetOk').textContent = t('showN')(list.length);
@@ -1156,19 +1105,24 @@ function focusPark(ref){
     if (m){ map2.setView(m.getLatLng(), 11); mobil ? showPcard(parks.find(p => p.reference === ref)) : m.openPopup(); }
   }, 50);
 }
-['cbAct', 'cbNo', 'cbLive', 'mRaion', 'mQ', 'mCall'].forEach(id => $(id).addEventListener('input', renderMap2));
-// La alegerea unui raion, harta se mută pe parcurile lui („Toate raioanele” = toată Moldova)
-$('mRaion').addEventListener('input', () => {
-  const fr = $('mRaion').value;
-  const pts = parks.filter(p => !fr || p.raion === fr).map(p => [p.latitude, p.longitude]);
-  if (map2 && pts.length && map2.getSize().x) map2.flyToBounds(pts, {padding: [40, 40], maxZoom: 12, duration: 0.8});   // harta ascunsă (0×0) nu se poate muta
-  // Pe ecrane medii (filtrele stau deasupra hărții) coborâm la hartă ca să se vadă zoom-ul
-  if (!mobil && innerWidth <= 900) $('map2').scrollIntoView({behavior: 'smooth', block: 'center'});
+['cbAct', 'cbNo', 'cbLive', 'mQ', 'mCall'].forEach(id => $(id).addEventListener('input', renderMap2));
+// Căutarea mută harta pe parcurile găsite (după o mică pauză de tastare); căutare goală = toată Moldova
+let pctHarta = [], qTimer = null;
+$('mQ').addEventListener('input', () => {
+  clearTimeout(qTimer);
+  qTimer = setTimeout(() => {
+    const cauta = $('mQ').value.trim();
+    const pts = cauta ? pctHarta : parks.map(p => [p.latitude, p.longitude]);
+    if (!map2 || !pts.length || !map2.getSize().x) return;   // harta ascunsă (0×0) nu se poate muta
+    map2.flyToBounds(pts, {padding: [40, 40], maxZoom: 12, duration: 0.8});
+    // Pe ecrane medii (filtrele stau deasupra hărții) coborâm la hartă ca să se vadă mutarea
+    if (cauta && !mobil && innerWidth <= 900) $('map2').scrollIntoView({behavior: 'smooth', block: 'center'});
+  }, 500);
 });
-// „Resetează filtrele”: toate tipurile, toate raioanele, fără căutare, toată Moldova
+// „Resetează filtrele”: toate tipurile, fără căutare, fără indicativ, toată Moldova
 $('resetF').onclick = () => {
   ['cbAct', 'cbNo', 'cbLive'].forEach(id => $(id).checked = true);
-  $('mRaion').value = ''; $('mQ').value = ''; $('mCall').value = '';
+  $('mQ').value = ''; $('mCall').value = '';
   renderMap2();
   if (map2.getSize().x) map2.flyToBounds(parks.map(p => [p.latitude, p.longitude]), {padding: [12, 12], duration: 0.8});
 };
@@ -1188,7 +1142,7 @@ $('backdrop').onclick = closeSheets;
 // ---------- Pagina Clasament ----------
 function renderClasament(){
   $$('.tabs a').forEach(a => a.classList.toggle('on', a.dataset.tab === tab));
-  $('tabNote').textContent = t({activatori: 'noteOps', parcuri: 'noteParks', raioane: 'noteRaion'}[tab]);
+  $('tabNote').textContent = t({activatori: 'noteOps', parcuri: 'noteParks'}[tab]);
   const el = $('bigTable');
   if (tab === 'activatori'){
     const rank = Object.fromEntries(lead.map((r, i) => [r.indicativ, i + 1]));
@@ -1217,7 +1171,6 @@ function renderClasament(){
     tabel(el, [
       {k: 'reference', label: t('cRef'), cell: p => refTag(p.reference, p.activations > 0)},
       {k: 'name', label: t('cPark'), cls: 'name', cell: p => `<span title="${esc(p.name)}">${esc(shortName(p.name))}</span>`},
-      {k: 'raion', label: t('cRaion')},
       {k: 'activations', label: t('cActs'), num: 1},
       {k: 'qsos', label: t('cQso'), num: 1, cell: p => fmt(p.qsos)},
       {k: 'ops', label: t('cOps'), num: 1},
@@ -1225,23 +1178,9 @@ function renderClasament(){
     ], rows, st.tparks, {id: p => p.reference, redo: renderClasament,
       sortKeys: ['qsos', 'activations', 'ops', 'last'],
       card: p => `<div class="t">${refTag(p.reference, p.activations > 0)}<b>${esc(numeRo(p.name))}</b></div>
-        <div class="m">${esc(p.raion)} · ${t('nActs')(p.activations)} · ${fmt(p.qsos)} QSO</div>
+        <div class="m">${t('nActs')(p.activations)} · ${fmt(p.qsos)} QSO</div>
         <div class="m">${p.ops} ${t('cOps').toLowerCase()} · ${t('cLast').toLowerCase()} ${fmtDate(p.last)}</div>`,
       click: id => { location.hash = '#parcuri/' + id; }});
-  }
-  if (tab === 'raioane'){
-    tabel(el, [
-      {k: 'raion', label: t('cRaion'), cell: r => `<b>${esc(r.raion)}</b>`},
-      {k: 'n', label: t('cParks'), num: 1},
-      {k: 'a', label: t('cActd'), num: 1},
-      {k: 'pct', label: t('cPct'), num: 1, cell: r => r.pct + '%'},
-      {k: 'bar', cell: r => `<div class="bar mini"><i style="width:${r.pct}%"></i></div>`},
-      {k: 'acts', label: t('cActs'), num: 1},
-      {k: 'q', label: t('cQso'), num: 1, cell: r => fmt(r.q)},
-    ], raionStats(), st.rai, {redo: renderClasament, sortKeys: ['n', 'pct', 'q'],
-      card: r => `<div class="t"><b>${esc(r.raion)}</b><span class="m" style="margin:0 0 0 auto">${r.a}/${r.n} · ${r.pct}%</span></div>
-        <div class="bar mini"><i style="width:${r.pct}%"></i></div>
-        <div class="m">${t('nActs')(r.acts)} · ${fmt(r.q)} QSO</div>`});
   }
 }
 function detaliuActivator(r){
@@ -1257,7 +1196,7 @@ function detaliuActivator(r){
 // ---------- Pagina Parcuri ----------
 function renderAllParks(){
   $('parksTitle').textContent = t('parksTitle')(parks.length);
-  tabel($('allParks'), parkCols(true), filtreaza($('pQ').value, $('pAct').value, $('pRaion').value), st.all,
+  tabel($('allParks'), parkCols(true), filtreaza($('pQ').value, $('pAct').value), st.all,
     {id: p => p.reference, open: openPark, detail: istoricParc, empty: t('noParks'), redo: renderAllParks,
      sortKeys: ['reference', 'activations', 'qsos', 'last'], card: p => parkCard(p, true),
      click: id => { openPark = openPark === id ? null : id; histAll = false; renderAllParks(); }});
@@ -1287,7 +1226,7 @@ function istoricParc(p){
       <td class="r">${a.cw || '—'}</td><td class="r">${a.ph || '—'}</td><td class="r">${a.data || '—'}</td></tr>`).join('') +
     `</table>${links}`;
 }
-['pQ', 'pAct', 'pRaion'].forEach(id => $(id).addEventListener('input', renderAllParks));
+['pQ', 'pAct'].forEach(id => $(id).addEventListener('input', renderAllParks));
 
 // ---------- Spoturi live (doar cât timp pagina e vizibilă) ----------
 let spotTimer = null, spotsFail = false;          // spotsFail = ultima încercare a eșuat

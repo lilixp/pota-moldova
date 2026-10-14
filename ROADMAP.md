@@ -66,6 +66,7 @@ Făcute mai devreme decât era planificat:
 - 💡 Pagină separată **Hunteri** în meniu (top 5 hunteri pe parc, limita datelor de pe pota.app)
 - 💡 Noutăți: parcuri noi în listă, activatori noi (cu puțini activatori nu spun mare lucru acum)
 - 💡 Evoluția în timp: activări și QSO pe luni sau ani, grafic (la fel)
+- 💡 **Regiuni**: raioanele au fost scoase din pagină (14.10.2026); revenim la o împărțire pe regiuni doar după ce reforma administrativ-teritorială e adoptată legal
 - 💡 **Parcuri lângă mine (GPS)**: butonul „Lângă mine” arată parcurile cele mai apropiate, cu distanța; poziția rămâne doar în browser
 
 ## Etapa 4 – Durabilitate ⬜

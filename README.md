@@ -15,14 +15,14 @@ Unofficial statistics for the **Parks on the Air (POTA)** parks in the Republic 
 
 | Page | Address | What you get |
 |---|---|---|
-| **Now** | `#acum` | Live band (who is on the air in MD parks right now, or the last activation), map of all parks, key numbers, top 10 activators, top 10 parks, districts, park search (10 at a time, "Show 10 more"), callsign stats |
-| **Map** | `#harta` | Full-size map with filters (activated / not activated / on the air, district, search). Type a callsign to see which parks it has activated. Click a park for a short card |
-| **Leaderboards** | `#clasament` | Three sortable tabs: activators, parks, districts. Click an activator to see their MD parks |
+| **Now** | `#acum` | Live band (who is on the air in MD parks right now, or the last activation), map of all parks, key numbers, top 10 activators, top 10 parks, park search (10 at a time, "Show 10 more"), callsign stats |
+| **Map** | `#harta` | Full-size map with filters (activated / not activated / on the air, search; the map moves to the parks found). Type a callsign to see which parks it has activated. Click a park for a short card |
+| **Leaderboards** | `#clasament` | Two sortable tabs: activators and parks. Click an activator to see their MD parks |
 | **Parks** | `#parcuri` | All MD parks, sortable, with the activation history of each park (date, activator, QSOs, CW / phone / data) |
 
 - **Callsign stats** in two cards: **Moldova** (from this page's daily data) and **Global** (live from the public pota.app profile).
 - **Romanian / English**, chosen automatically from the browser, switchable with the RO | EN button, or forced with `?lang=en`.
-- **Direct links** you can share: `#harta/MD-0066` (map centred on a park), `#parcuri/MD-0066` (park history), `#clasament/ER1PL` (an activator), `#clasament/raioane` (districts).
+- **Direct links** you can share: `#harta/MD-0066` (map centred on a park), `#parcuri/MD-0066` (park history), `#clasament/ER1PL` (an activator).
 - Map markers: **green dot** = activated, **red dot** = not activated yet, **blue dot with pulse** = on the air now. With a callsign typed: green = activated by that callsign, **orange** = attempts only (under 10 QSOs), red = not activated by it.
 - Callsigns with `/P`, `/QRP` or a prefix (`F/ER1SKI`) are looked up under the base callsign, as pota.app does.
 
@@ -65,7 +65,7 @@ Visitor's browser
 | `index.html` | The whole website (HTML + CSS + JavaScript, one file) |
 | `scripts/colecteaza.py` | Daily collector (Python, standard library only) |
 | `.github/workflows/actualizeaza-date.yml` | Runs the collector daily and publishes the site |
-| `data/parcuri.json` | MD parks (reference, name, coordinates, district, activations, QSOs) |
+| `data/parcuri.json` | MD parks (reference, name, coordinates, grid locator, activations, QSOs) |
 | `data/activari.json` | All activations, per park |
 | `data/clasament.json` | Activator leaderboard |
 | `data/meta.json` | Update time, last activation, errors |
