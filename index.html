@@ -19,6 +19,7 @@
   --act:#4a7a35; --act-soft:#e1ead7;     /* parc activat: verde de pădure pe hartă */
   --none:#7a5228; --none-fill:#f3eadf;   /* neactivat: maro de curbă de nivel */
   --live:#c8322b; --live-soft:#fbeceb;   /* în aer acum */
+  --tent:#eea29c;                        /* doar tentative (sub 10 QSO) ale unui indicativ: roz */
   --me:#2f6f9f;                          /* albastru de apă: cartonașul Global */
   --hi:#8a5a2b; --hi-soft:#f3eadf;       /* „așteaptă prima activare” */
   --head:"Bitter",Georgia,serif; --body:"Source Sans 3",system-ui,sans-serif;
@@ -101,6 +102,8 @@ nav a.lnk.on{color:var(--ink);border-bottom-color:var(--act)}
 .mk.act{background:var(--act);box-shadow:0 0 0 2px #fff}
 .mk.no{width:13px;height:13px;border:2.5px solid var(--none);background:radial-gradient(circle,var(--none) 0 2px,#fff 2.5px)}
 .mk.live{background:var(--live)}
+.mk.tent{background:var(--tent);box-shadow:0 0 0 2px #fff}
+.tentLg{display:flex;align-items:center;gap:8px;font-size:14px;margin-top:6px}
 /* Valul care pulsează în jurul unui parc „în aer acum” */
 .puls{display:block;width:16px;height:16px;border-radius:50%;border:2px solid var(--live);animation:val 1.8s ease-out infinite}
 @keyframes val{from{transform:scale(1);opacity:.8}to{transform:scale(2.3);opacity:0}}
@@ -122,6 +125,8 @@ nav a.lnk.on{color:var(--ink);border-bottom-color:var(--act)}
 .side .cnt{color:var(--muted);font-size:14px}
 .sidehd{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
 .sidehd b{font:700 18px var(--head)}
+.callIn{text-transform:uppercase}
+#mCallCnt{margin-top:4px}
 #map2{height:calc(100vh - 210px);min-height:480px;border:1px solid var(--line);border-radius:var(--radius);background:var(--line)}
 
 /* ---------- Tabele ---------- */
@@ -425,13 +430,19 @@ footer .upd{color:var(--ink);font-weight:700;margin-bottom:6px}
     <aside class="side" id="side">
       <!-- Titlul panoului + „Resetează filtrele” (apare doar când un filtru e schimbat) -->
       <div class="sidehd"><b data-t="filters"></b><button class="linkbtn" id="resetF" data-t="resetF" hidden></button></div>
+      <!-- Indicativ: verde = parcurile activate de el, cerc maro = cele pe care nu le-a activat încă -->
+      <div><h3><label for="mCall" data-t="mapCall"></label></h3>
+        <input type="search" id="mCall" class="callIn" placeholder="ER1PL" autocomplete="off" spellcheck="false">
+        <div class="cnt" id="mCallCnt"></div></div>
       <div>
         <h3 data-t="mapShow"></h3>
         <div class="cbs">
-          <label class="cb"><input type="checkbox" id="cbAct" checked><span class="mk act"></span><span data-t="lgAct"></span></label>
-          <label class="cb"><input type="checkbox" id="cbNo" checked><span class="mk no"></span><span data-t="lgNo"></span></label>
+          <label class="cb"><input type="checkbox" id="cbAct" checked><span class="mk act"></span><span id="lgAct2" data-t="lgAct"></span></label>
+          <label class="cb"><input type="checkbox" id="cbNo" checked><span class="mk no"></span><span id="lgNo2" data-t="lgNo"></span></label>
           <label class="cb"><input type="checkbox" id="cbLive" checked><span class="mk live"></span><span data-t="lgLive"></span></label>
         </div>
+        <!-- Apare doar când e scris un indicativ: parcurile unde are numai tentative -->
+        <div class="tentLg" id="lgTent" hidden><span class="mk tent"></span><span data-t="lgTent"></span></div>
       </div>
       <div><h3><label for="mRaion" data-t="mapRaion"></label></h3><select id="mRaion" class="fRaion"></select></div>
       <div><h3><label for="mQ" data-t="mapSearch"></label></h3><input type="search" id="mQ" data-t-ph="search" autocomplete="off"></div>
@@ -548,7 +559,11 @@ const T = {
     tentRow: (a, p) => `Tentative sub 10 QSO: <b>${a}</b> · parcuri doar cu tentative: <b>${p}</b>`,
     glNote: 'Live din profilul public pota.app, la cererea ta. Doar activările valide (cel puțin 10 QSO), ca pe pota.app.',
     // Pagina Hartă
-    mapPageTitle: 'Harta parcurilor', mapShow: 'Arată pe hartă', mapRaion: 'Raion', mapSearch: 'Caută',
+    mapPageTitle: 'Harta parcurilor', mapShow: 'Arată pe hartă', mapRaion: 'Raion', mapSearch: 'Caută', mapCall: 'Parcurile unui indicativ',
+    callCnt: (c, n, tot) => `${c}: ${n} din ${tot} ${de(tot)}parcuri (${n * 100 / tot < 1 ? '<1' : Math.round(n * 100 / tot)}%)`,
+    callZero: c => `${c} nu are activări valide în parcurile MD.`,
+    lgActBy: c => `activat de ${c}`, lgNoBy: c => `neactivat de ${c}`,
+    lgTent: 'doar tentative (sub 10 QSO)', tentCnt: n => ` · ${n} doar ${n === 1 ? 'tentativă' : 'tentative'}`,
     mapCount: n => `${n} ${n === 1 ? 'parc' : de(n) + 'parcuri'} pe hartă`,
     fActs: 'Activări', fQso: 'QSO', fLast: 'Ultima activare', fNever: 'încă nu a fost activat',
     history: 'Istoricul activărilor', onPota: 'Pagina parcului pe pota.app', showOnMap: 'Vezi pe hartă',
@@ -628,7 +643,11 @@ const T = {
     inMd: n => `${n} in Moldova`, elsewhere: (n, a) => `${n} in other countries (${a} ${a === 1 ? 'activation' : 'activations'})`,
     tentRow: (a, p) => `Attempts under 10 QSOs: <b>${a}</b> · parks with attempts only: <b>${p}</b>`,
     glNote: 'Live from the public pota.app profile, on request. Valid activations only (at least 10 QSOs), as on pota.app.',
-    mapPageTitle: 'Park map', mapShow: 'Show on the map', mapRaion: 'District', mapSearch: 'Search',
+    mapPageTitle: 'Park map', mapShow: 'Show on the map', mapRaion: 'District', mapSearch: 'Search', mapCall: 'Parks of a callsign',
+    callCnt: (c, n, tot) => `${c}: ${n} of ${tot} parks (${n * 100 / tot < 1 ? '<1' : Math.round(n * 100 / tot)}%)`,
+    callZero: c => `${c} has no valid activations in MD parks.`,
+    lgActBy: c => `activated by ${c}`, lgNoBy: c => `not activated by ${c}`,
+    lgTent: 'attempts only (under 10 QSOs)', tentCnt: n => ` · ${n} attempts only`,
     mapCount: n => `${n} ${n === 1 ? 'park' : 'parks'} on the map`,
     fActs: 'Activations', fQso: 'QSOs', fLast: 'Last activation', fNever: 'not activated yet',
     history: 'Activation history', onPota: 'Park page on pota.app', showOnMap: 'Show on map',
@@ -933,16 +952,19 @@ function fisa(p){                                   // fișa scurtă care se des
     <div class="acts"><a href="#parcuri/${esc(p.reference)}">${t('history')}</a>
       <a href="https://pota.app/#/park/${esc(p.reference)}" target="_blank" rel="noopener">${t('onPota')}</a></div></div>`;
 }
-function drawParks(lyr, list, store, jos){
+function drawParks(lyr, list, store, jos, activ = p => p.activations > 0, tent = () => false){
   const css = getComputedStyle(document.documentElement), col = v => css.getPropertyValue(v).trim();
   const live = liveSet();
   // Ordinea contează: neactivatele jos, activatele deasupra, cele „în aer” deasupra tuturor
-  const grupa = p => live.has(p.reference) ? 2 : p.activations > 0 ? 1 : 0;
+  // 0 = neactivat, 0.5 = doar tentative, 1 = activat, 2 = în aer (ordinea de desenare, de jos în sus)
+  const grupa = p => live.has(p.reference) ? 2 : activ(p) ? 1 : tent(p) ? 0.5 : 0;
   [...list].sort((a, b) => grupa(a) - grupa(b)).forEach(p => {
     const ll = [p.latitude, p.longitude], g = grupa(p);
     let m;
     if (g === 0){                                   // neactivat: cerc alb cu inel maro și punct maro în centru
       m = L.circleMarker(ll, {radius: 6, color: col('--none'), weight: 2.5, fillColor: '#fff', fillOpacity: 1});
+    } else if (g === 0.5){                          // doar tentative: punct roz cu contur alb
+      m = L.circleMarker(ll, {radius: 6, color: '#fff', weight: 2, fillColor: col('--tent'), fillOpacity: 1});
     } else if (g === 1){                            // activat: punct verde cu contur alb
       m = L.circleMarker(ll, {radius: 6, color: '#fff', weight: 2, fillColor: col('--act'), fillOpacity: 1});
     } else {                                        // în aer: punct roșu + val care pulsează
@@ -1069,18 +1091,31 @@ function renderMap2(){
   if (!map2) map2 = newMap('map2');
   else map2.invalidateSize();
   const live = liveSet(), q = norm($('mQ').value.trim()), fr = $('mRaion').value;
+  // Indicativul scris (F/ER1SKI -> ER1SKI): verde devine „activat de el”
+  const raw = $('mCall').value.trim().toUpperCase().replace(/\s+/g, ''), call = raw ? baza(raw) : '';
+  const mele = byCall[call]?.parks || {};
+  const activ = call ? p => mele[p.reference]?.n > 0 : p => p.activations > 0;
+  const tent = p => !!mele[p.reference] && !(mele[p.reference].n > 0);   // are QSO acolo, dar nicio activare validă
+  const nT = call ? parks.filter(tent).length : 0;
+  if (call){
+    const n = parks.filter(activ).length;
+    $('mCallCnt').textContent = (n || nT ? t('callCnt')(call, n, parks.length) : t('callZero')(call)) + (nT ? t('tentCnt')(nT) : '');
+  } else $('mCallCnt').textContent = '';
+  $('lgTent').hidden = !nT;
+  $('lgAct2').textContent = call ? t('lgActBy')(call) : t('lgAct');
+  $('lgNo2').textContent = call ? t('lgNoBy')(call) : t('lgNo');
   const list = parks.filter(p => {
-    const g = live.has(p.reference) ? 'live' : p.activations > 0 ? 'act' : 'no';
+    const g = live.has(p.reference) ? 'live' : activ(p) ? 'act' : 'no';
     return ((g === 'act' && $('cbAct').checked) || (g === 'no' && $('cbNo').checked) || (g === 'live' && $('cbLive').checked)) &&
       (!fr || p.raion === fr) && (!q || p.cauta.includes(q));
   });
   if (layer2) layer2.remove();
   layer2 = L.layerGroup().addTo(map2);
   markers2 = {};
-  drawParks(layer2, list, markers2, mobil);
+  drawParks(layer2, list, markers2, mobil, activ, call ? tent : undefined);
   $('mCount').textContent = t('mapCount')(list.length);
   // Câte filtre sunt schimbate față de „tot” (pentru „Filtre (2)” și „Resetează filtrele”)
-  const nF = ['cbAct', 'cbNo', 'cbLive'].filter(id => !$(id).checked).length + (fr ? 1 : 0) + (q ? 1 : 0);
+  const nF = ['cbAct', 'cbNo', 'cbLive'].filter(id => !$(id).checked).length + (fr ? 1 : 0) + (q ? 1 : 0) + (call ? 1 : 0);
   $('resetF').hidden = nF === 0;
   $('fabTxt').textContent = `${t('filters')}${nF ? ` (${nF})` : ''} · ${t('mapCount')(list.length).replace(/ pe hartă| on the map/, '')}`;
   $('sheetOk').textContent = t('showN')(list.length);
@@ -1094,21 +1129,21 @@ function focusPark(ref){
     if (m){ map2.setView(m.getLatLng(), 11); mobil ? showPcard(parks.find(p => p.reference === ref)) : m.openPopup(); }
   }, 50);
 }
-['cbAct', 'cbNo', 'cbLive', 'mRaion', 'mQ'].forEach(id => $(id).addEventListener('input', renderMap2));
+['cbAct', 'cbNo', 'cbLive', 'mRaion', 'mQ', 'mCall'].forEach(id => $(id).addEventListener('input', renderMap2));
 // La alegerea unui raion, harta se mută pe parcurile lui („Toate raioanele” = toată Moldova)
 $('mRaion').addEventListener('input', () => {
   const fr = $('mRaion').value;
   const pts = parks.filter(p => !fr || p.raion === fr).map(p => [p.latitude, p.longitude]);
-  if (map2 && pts.length) map2.flyToBounds(pts, {padding: [40, 40], maxZoom: 12, duration: 0.8});
+  if (map2 && pts.length && map2.getSize().x) map2.flyToBounds(pts, {padding: [40, 40], maxZoom: 12, duration: 0.8});   // harta ascunsă (0×0) nu se poate muta
   // Pe ecrane medii (filtrele stau deasupra hărții) coborâm la hartă ca să se vadă zoom-ul
   if (!mobil && innerWidth <= 900) $('map2').scrollIntoView({behavior: 'smooth', block: 'center'});
 });
 // „Resetează filtrele”: toate tipurile, toate raioanele, fără căutare, toată Moldova
 $('resetF').onclick = () => {
   ['cbAct', 'cbNo', 'cbLive'].forEach(id => $(id).checked = true);
-  $('mRaion').value = ''; $('mQ').value = '';
+  $('mRaion').value = ''; $('mQ').value = ''; $('mCall').value = '';
   renderMap2();
-  map2.flyToBounds(parks.map(p => [p.latitude, p.longitude]), {padding: [12, 12], duration: 0.8});
+  if (map2.getSize().x) map2.flyToBounds(parks.map(p => [p.latitude, p.longitude]), {padding: [12, 12], duration: 0.8});
 };
 // Panoul „Filtre” și fișa parcului (doar pe telefon)
 function showPcard(p){

@@ -53,6 +53,10 @@ Ordinea etapelor: **stabilizare → pagina web pentru telefon → lansare public
 3. ⬜ Noutăți: parcuri noi în listă, activatori noi, parcuri activate prima dată
 4. ⬜ Evoluția în timp: activări și QSO pe luni sau ani (grafic)
 
+Făcute mai devreme decât era planificat:
+
+- ✅ **Harta unui indicativ**: pe pagina Hartă scrii indicativul și vezi parcurile activate de el (verde), cele cu doar tentative (roz) și cele neactivate
+
 ## Etapa 5 – Aplicație pentru telefon ⬜
 
 *Doar după ce toate etapele de mai sus sunt gata și pagina e oficială pe internet.*
