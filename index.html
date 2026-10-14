@@ -1111,6 +1111,14 @@ function focusPark(ref){
   }, 50);
 }
 ['cbAct', 'cbNo', 'cbLive', 'mRaion', 'mQ'].forEach(id => $(id).addEventListener('input', renderMap2));
+// La alegerea unui raion, harta se mută pe parcurile lui („Toate raioanele” = toată Moldova)
+$('mRaion').addEventListener('input', () => {
+  const fr = $('mRaion').value;
+  const pts = parks.filter(p => !fr || p.raion === fr).map(p => [p.latitude, p.longitude]);
+  if (map2 && pts.length) map2.flyToBounds(pts, {padding: [40, 40], maxZoom: 12, duration: 0.8});
+  // Pe ecrane medii (filtrele stau deasupra hărții) coborâm la hartă ca să se vadă zoom-ul
+  if (!mobil && innerWidth <= 900) $('map2').scrollIntoView({behavior: 'smooth', block: 'center'});
+});
 // Panoul „Filtre” și fișa parcului (doar pe telefon)
 function showPcard(p){
   $('pcard').innerHTML = `<button class="x" aria-label="${t('close')}">×</button>` + fisa(p);
