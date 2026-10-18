@@ -290,6 +290,15 @@
  "MD-0012": [
   {
    "activeCallsign": "ER1SKI",
+   "qso_date": "20261017",
+   "totalQSOs": 21,
+   "qsosCW": 0,
+   "qsosDATA": 21,
+   "qsosPHONE": 0,
+   "locationDesc": "MD-CU"
+  },
+  {
+   "activeCallsign": "ER1SKI",
    "qso_date": "20260912",
    "totalQSOs": 17,
    "qsosCW": 0,
@@ -1404,6 +1413,61 @@
    "qsosDATA": 19,
    "qsosPHONE": 0,
    "locationDesc": "MD-CL"
+  }
+ ],
+ "MD-0081": [
+  {
+   "activeCallsign": "ER1SKI",
+   "qso_date": "20261017",
+   "totalQSOs": 11,
+   "qsosCW": 0,
+   "qsosDATA": 11,
+   "qsosPHONE": 0,
+   "locationDesc": "MD-ST"
+  }
+ ],
+ "MD-0082": [
+  {
+   "activeCallsign": "ER1SKI",
+   "qso_date": "20261017",
+   "totalQSOs": 12,
+   "qsosCW": 0,
+   "qsosDATA": 12,
+   "qsosPHONE": 0,
+   "locationDesc": "MD-ST"
+  }
+ ],
+ "MD-0095": [
+  {
+   "activeCallsign": "ER1SKI",
+   "qso_date": "20261017",
+   "totalQSOs": 13,
+   "qsosCW": 0,
+   "qsosDATA": 13,
+   "qsosPHONE": 0,
+   "locationDesc": "MD-CU"
+  }
+ ],
+ "MD-0125": [
+  {
+   "activeCallsign": "ER1SKI",
+   "qso_date": "20261017",
+   "totalQSOs": 15,
+   "qsosCW": 0,
+   "qsosDATA": 15,
+   "qsosPHONE": 0,
+   "locationDesc": "MD-CU"
+  }
+ ],
+ "MD-0240": [
+  {
+   "activeCallsign": "ER1SKI",
+   "qso_date": "20261017",
+   "totalQSOs": 12,
+   "qsosCW": 0,
+   "qsosDATA": 12,
+   "qsosPHONE": 0,
+   "locationDesc": "MD-CU"
   }
  ]
 }
