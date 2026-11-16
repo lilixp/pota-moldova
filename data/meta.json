@@ -1,13 +1,13 @@
 {
  "ultima_activare": {
   "indicativ": "ER1SKI",
-  "parc": "MD-0012",
-  "data": "2026-10-17"
+  "parc": "MD-0024",
+  "data": "2026-11-15"
  },
- "actualizat_utc": "2026-11-15T11:11:26+00:00",
+ "actualizat_utc": "2026-11-16T07:16:40+00:00",
  "parcuri": 232,
- "cereri": 1,
- "parcuri_actualizate": 0,
+ "cereri": 2,
+ "parcuri_actualizate": 1,
  "oprit": null,
  "erori": []
 }

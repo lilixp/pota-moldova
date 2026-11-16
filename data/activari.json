@@ -1469,5 +1469,16 @@
    "qsosPHONE": 0,
    "locationDesc": "MD-CU"
   }
+ ],
+ "MD-0024": [
+  {
+   "activeCallsign": "ER1SKI",
+   "qso_date": "20261115",
+   "totalQSOs": 57,
+   "qsosCW": 0,
+   "qsosDATA": 11,
+   "qsosPHONE": 46,
+   "locationDesc": "MD-CU"
+  }
  ]
 }
