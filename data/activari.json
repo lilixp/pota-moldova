@@ -625,6 +625,24 @@
  ],
  "MD-0060": [
   {
+   "activeCallsign": "SQ9MDF",
+   "qso_date": "20260731",
+   "totalQSOs": 29,
+   "qsosCW": 0,
+   "qsosDATA": 0,
+   "qsosPHONE": 29,
+   "locationDesc": "MD-SO"
+  },
+  {
+   "activeCallsign": "SQ9NOT",
+   "qso_date": "20260731",
+   "totalQSOs": 12,
+   "qsosCW": 0,
+   "qsosDATA": 0,
+   "qsosPHONE": 12,
+   "locationDesc": "MD-SO"
+  },
+  {
    "activeCallsign": "ER1SKI",
    "qso_date": "20251014",
    "totalQSOs": 14,
